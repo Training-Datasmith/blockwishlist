@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -36,7 +38,7 @@ use ProductPresenterFactory;
 
 class StatisticsCalculator
 {
-    const ARRAY_KEYS_STATS = [
+    public const ARRAY_KEYS_STATS = [
         'allTime',
         'currentYear',
         'currentMonth',
@@ -77,17 +79,17 @@ class StatisticsCalculator
         switch ($statsRange) {
             case 'currentYear':
                 $dateStart = (new DateTime('now'))->modify('-1 year')->format('Y-m-d H:i:s');
-            break;
+                break;
             case 'currentMonth':
                 $dateStart = (new DateTime('now'))->modify('-1 month')->format('Y-m-d H:i:s');
-            break;
+                break;
             case 'currentDay':
                 $dateStart = (new DateTime('now'))->modify('-1 day')->format('Y-m-d H:i:s');
-            break;
+                break;
             case 'allTime':
             default:
                 $dateStart = null;
-            break;
+                break;
         }
 
         if (null !== $dateStart) {

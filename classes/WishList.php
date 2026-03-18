@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -76,7 +78,8 @@ class WishList extends ObjectModel
         $cache_id = 'WishList::getCustomers';
 
         if (false === Cache::isStored($cache_id)) {
-            $result = Db::getInstance((bool) _PS_USE_SQL_SLAVE_)->executeS('
+            $result = Db::getInstance((bool) _PS_USE_SQL_SLAVE_)->executeS(
+                '
                 SELECT c.`id_customer`, c.`firstname`, c.`lastname`
                     FROM `' . _DB_PREFIX_ . 'wishlist` w
                 INNER JOIN `' . _DB_PREFIX_ . 'customer` c ON c.`id_customer` = w.`id_customer`
@@ -99,7 +102,8 @@ class WishList extends ObjectModel
      */
     public static function exists($id_wishlist, $id_customer)
     {
-        $result = Db::getInstance()->getRow('
+        $result = Db::getInstance()->getRow(
+            '
             SELECT 1
             FROM `' . _DB_PREFIX_ . 'wishlist`
             WHERE `id_wishlist` = ' . (int) $id_wishlist . '
@@ -159,7 +163,8 @@ class WishList extends ObjectModel
      */
     public static function addProduct($id_wishlist, $id_customer, $id_product, $id_product_attribute, $quantity)
     {
-        $result = Db::getInstance()->getRow('
+        $result = Db::getInstance()->getRow(
+            '
             SELECT wp.`quantity`
                 FROM `' . _DB_PREFIX_ . 'wishlist_product` wp
             JOIN `' . _DB_PREFIX_ . 'wishlist` w ON (w.`id_wishlist` = wp.`id_wishlist`)
@@ -208,7 +213,8 @@ class WishList extends ObjectModel
      */
     public static function removeProduct($id_wishlist, $id_customer, $id_product, $id_product_attribute)
     {
-        $result = Db::getInstance()->getRow('
+        $result = Db::getInstance()->getRow(
+            '
             SELECT w.`id_wishlist`, wp.`id_wishlist_product`
             FROM `' . _DB_PREFIX_ . 'wishlist` w
             LEFT JOIN `' . _DB_PREFIX_ . 'wishlist_product` wp ON (wp.`id_wishlist` = w.`id_wishlist`)
@@ -339,7 +345,8 @@ class WishList extends ObjectModel
      */
     public static function getProductsByWishlist($id_wishlist)
     {
-        $wishlistProducts = Db::getInstance()->executeS('
+        $wishlistProducts = Db::getInstance()->executeS(
+            '
             SELECT `id_product`, `id_product_attribute`, `quantity`
             FROM `' . _DB_PREFIX_ . 'wishlist_product`
             WHERE `id_wishlist` = ' . (int) $id_wishlist . '
@@ -366,7 +373,8 @@ class WishList extends ObjectModel
      */
     public static function getProductByIdCustomer($id_wishlist, $id_customer, $id_lang, $id_product = null, $quantity = false)
     {
-        $products = Db::getInstance()->executeS('
+        $products = Db::getInstance()->executeS(
+            '
             SELECT wp.`id_product`, wp.`quantity` as wishlist_quantity, p.`quantity` AS product_quantity, pl.`name`, wp.`id_product_attribute`, wp.`priority`, pl.link_rewrite, cl.link_rewrite AS category_rewrite
             FROM `' . _DB_PREFIX_ . 'wishlist_product` wp
             LEFT JOIN `' . _DB_PREFIX_ . 'product` p ON p.`id_product` = wp.`id_product`
@@ -430,7 +438,8 @@ class WishList extends ObjectModel
      */
     public static function addBoughtProduct($id_wishlist, $id_product, $id_product_attribute, $id_cart, $quantity)
     {
-        $result = Db::getInstance()->getRow('
+        $result = Db::getInstance()->getRow(
+            '
             SELECT `quantity`, `id_wishlist_product`
             FROM `' . _DB_PREFIX_ . 'wishlist_product` wp
             WHERE `id_wishlist` = ' . (int) $id_wishlist . '
@@ -444,14 +453,16 @@ class WishList extends ObjectModel
             return false;
         }
 
-        Db::getInstance()->executeS('
+        Db::getInstance()->executeS(
+            '
             SELECT *
             FROM `' . _DB_PREFIX_ . 'wishlist_product_cart`
             WHERE `id_wishlist_product`=' . (int) $result['id_wishlist_product'] . ' AND `id_cart`=' . (int) $id_cart
         );
 
         if (Db::getInstance()->NumRows() > 0) {
-            $result2 = Db::getInstance()->execute('
+            $result2 = Db::getInstance()->execute(
+                '
                 UPDATE `' . _DB_PREFIX_ . 'wishlist_product_cart`
                 SET `quantity`=`quantity` + ' . (int) $quantity . '
                 WHERE `id_wishlist_product`=' . (int) $result['id_wishlist_product'] . ' AND `id_cart`=' . (int) $id_cart
@@ -511,7 +522,8 @@ class WishList extends ObjectModel
             throw new PrestaShopException('Invalid token');
         }
 
-        return Db::getInstance((bool) _PS_USE_SQL_SLAVE_)->getRow('
+        return Db::getInstance((bool) _PS_USE_SQL_SLAVE_)->getRow(
+            '
             SELECT w.`id_wishlist`, w.`name`, w.`id_customer`, c.`firstname`, c.`lastname`
             FROM `' . _DB_PREFIX_ . 'wishlist` w
             INNER JOIN `' . _DB_PREFIX_ . 'customer` c ON c.`id_customer` = w.`id_customer`
@@ -533,7 +545,8 @@ class WishList extends ObjectModel
 
         if (!empty($old_carts)) {
             foreach ($old_carts as $old_cart) {
-                Db::getInstance()->execute('
+                Db::getInstance()->execute(
+                    '
                     DELETE FROM `' . _DB_PREFIX_ . 'cart_product`
                     WHERE id_cart=' . (int) $old_cart['id_cart'] . ' AND id_product=' . (int) $old_cart['id_product'] . ' AND id_product_attribute=' . (int) $old_cart['id_product_attribute']
                 );
@@ -548,7 +561,8 @@ class WishList extends ObjectModel
             LEFT JOIN `' . _DB_PREFIX_ . 'cart_product` cp ON (cp.id_cart = wpc.id_cart AND cp.id_product = wp.id_product AND cp.id_product_attribute = wp.id_product_attribute)
             WHERE (wp.id_wishlist = ' . (int) $id_wishlist . ' AND ((cp.id_product IS NULL AND cp.id_product_attribute IS NULL)))
             ');
-        $res = Db::getInstance()->executeS('
+        $res = Db::getInstance()->executeS(
+            '
             SELECT wp.id_wishlist_product, cp.quantity AS cart_quantity, wpc.quantity AS wish_quantity, wpc.id_cart
             FROM `' . _DB_PREFIX_ . 'wishlist_product_cart` wpc
             JOIN `' . _DB_PREFIX_ . 'wishlist_product` wp ON (wp.id_wishlist_product = wpc.id_wishlist_product)
@@ -560,12 +574,14 @@ class WishList extends ObjectModel
         if (!empty($res)) {
             foreach ($res as $refresh) {
                 if ($refresh['wish_quantity'] > $refresh['cart_quantity']) {
-                    Db::getInstance()->execute('
+                    Db::getInstance()->execute(
+                        '
                         UPDATE `' . _DB_PREFIX_ . 'wishlist_product`
                         SET `quantity`= `quantity` + ' . ((int) $refresh['wish_quantity'] - (int) $refresh['cart_quantity']) . '
                         WHERE id_wishlist_product=' . (int) $refresh['id_wishlist_product']
                     );
-                    Db::getInstance()->execute('
+                    Db::getInstance()->execute(
+                        '
                         UPDATE `' . _DB_PREFIX_ . 'wishlist_product_cart`
                         SET `quantity`=' . (int) $refresh['cart_quantity'] . '
                         WHERE id_wishlist_product=' . (int) $refresh['id_wishlist_product'] . ' AND id_cart=' . (int) $refresh['id_cart']
@@ -575,7 +591,8 @@ class WishList extends ObjectModel
         }
         if (!empty($freshwish)) {
             foreach ($freshwish as $prodcustomer) {
-                Db::getInstance()->execute('
+                Db::getInstance()->execute(
+                    '
                     UPDATE `' . _DB_PREFIX_ . 'wishlist_product` SET `quantity`=`quantity` +
                     (
                         SELECT `quantity` FROM `' . _DB_PREFIX_ . 'wishlist_product_cart`
@@ -583,7 +600,8 @@ class WishList extends ObjectModel
                     )
                     WHERE `id_wishlist_product`=' . (int) $prodcustomer['id_wishlist_product'] . ' AND `id_wishlist`=' . (int) $id_wishlist
                 );
-                Db::getInstance()->execute('
+                Db::getInstance()->execute(
+                    '
                     DELETE FROM `' . _DB_PREFIX_ . 'wishlist_product_cart`
                     WHERE `id_wishlist_product`=' . (int) $prodcustomer['id_wishlist_product'] . ' AND `id_cart`=' . (int) $prodcustomer['id_cart']
                 );
@@ -604,7 +622,8 @@ class WishList extends ObjectModel
 
         ++$counter;
 
-        return Db::getInstance()->execute('
+        return Db::getInstance()->execute(
+            '
             UPDATE `' . _DB_PREFIX_ . 'wishlist` SET
             `counter` = ' . $counter . '
             WHERE `id_wishlist` = ' . (int) $id_wishlist
@@ -618,7 +637,8 @@ class WishList extends ObjectModel
      */
     public static function getWishlistCounter($id_wishlist)
     {
-        return (int) Db::getInstance()->getValue('
+        return (int) Db::getInstance()->getValue(
+            '
             SELECT `counter`
             FROM `' . _DB_PREFIX_ . 'wishlist`
             WHERE `id_wishlist` = ' . (int) $id_wishlist
@@ -644,7 +664,8 @@ class WishList extends ObjectModel
 
         $cache_id = 'WhishList::getByIdCustomer_' . (int) $id_customer . '-' . (int) Shop::getContextShopID() . '-' . (int) Shop::getContextShopGroupID();
         if (!Cache::isStored($cache_id)) {
-            $result = Db::getInstance()->executeS('
+            $result = Db::getInstance()->executeS(
+                '
                 SELECT w.`id_wishlist`, w.`name`, w.`token`, w.`date_add`, w.`date_upd`, w.`counter`, w.`default`
                 FROM `' . _DB_PREFIX_ . 'wishlist` w
                 WHERE `id_customer` = ' . (int) $id_customer . '

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -33,7 +35,7 @@ if (file_exists($autoloadPath)) {
 
 class BlockWishList extends Module
 {
-    const HOOKS = [
+    public const HOOKS = [
         'actionAdminControllerSetMedia',
         'actionFrontControllerSetMedia',
         'actionAttributeDelete',
@@ -47,7 +49,7 @@ class BlockWishList extends Module
         'displayMyAccountBlock',
     ];
 
-    const MODULE_ADMIN_CONTROLLERS = [
+    public const MODULE_ADMIN_CONTROLLERS = [
         [
             'class_name' => 'WishlistConfigurationAdminParentController',
             'visible' => false,

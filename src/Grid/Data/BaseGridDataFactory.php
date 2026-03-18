@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -25,10 +27,10 @@ use PrestaShop\Module\BlockWishList\Calculator\StatisticsCalculator;
 
 class BaseGridDataFactory
 {
-    const CACHE_KEY_STATS_CURRENT_DAY = 'blockwishlist.stats.currentDay';
-    const CACHE_KEY_STATS_CURRENT_MONTH = 'blockwishlist.stats.currentMonth';
-    const CACHE_KEY_STATS_CURRENT_YEAR = 'blockwishlist.stats.currentYear';
-    const CACHE_KEY_STATS_ALL_TIME = 'blockwishlist.stats.allTime';
+    public const CACHE_KEY_STATS_CURRENT_DAY = 'blockwishlist.stats.currentDay';
+    public const CACHE_KEY_STATS_CURRENT_MONTH = 'blockwishlist.stats.currentMonth';
+    public const CACHE_KEY_STATS_CURRENT_YEAR = 'blockwishlist.stats.currentYear';
+    public const CACHE_KEY_STATS_ALL_TIME = 'blockwishlist.stats.allTime';
 
     /* @var CacheProvider $cache */
     protected $cache;

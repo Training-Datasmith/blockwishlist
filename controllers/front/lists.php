@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -29,7 +31,7 @@ class BlockWishlistListsModuleFrontController extends ModuleFrontController
         parent::initContent();
 
         $this->context->smarty->assign(
-        [
+            [
             'url' => $this->context->link->getModuleLink('blockwishlist', 'action', ['action' => 'getAllWishlist']),
             'renameUrl' => $this->context->link->getModuleLink('blockwishlist', 'action', ['action' => 'renameWishlist']),
             'shareUrl' => $this->context->link->getModuleLink('blockwishlist', 'action', ['action' => 'getUrlByIdWishlist']),
@@ -37,15 +39,15 @@ class BlockWishlistListsModuleFrontController extends ModuleFrontController
             'wishlistsTitlePage' => Configuration::get('blockwishlist_WishlistPageName', $this->context->language->id),
             'newWishlistCTA' => Configuration::get('blockwishlist_CreateButtonLabel', $this->context->language->id),
         ]
-      );
+        );
 
         $this->context->controller->registerJavascript(
-          'blockwishlistController',
-          'modules/blockwishlist/public/wishlistcontainer.bundle.js',
-          [
+            'blockwishlistController',
+            'modules/blockwishlist/public/wishlistcontainer.bundle.js',
+            [
             'priority' => 200,
           ]
-      );
+        );
 
         $this->setTemplate('module:blockwishlist/views/templates/pages/lists.tpl');
     }

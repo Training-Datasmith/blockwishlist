@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -109,7 +111,8 @@ class WishListProductSearchProvider implements ProductSearchProviderInterface
             pl.`meta_title`, pl.`name`, pl.`available_now`, pl.`available_later`');
             $querySearch->select('image_shop.`id_image` AS id_image');
             $querySearch->select('il.`legend`');
-            $querySearch->select('
+            $querySearch->select(
+                '
             DATEDIFF(
                 product_shop.`date_add`,
                 DATE_SUB(

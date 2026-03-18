@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -28,7 +30,7 @@ use PrestaShop\PrestaShop\Core\Grid\Search\SearchCriteriaInterface;
 class AllTimeStatisticsGridDataFactory extends BaseGridDataFactory implements GridDataFactoryInterface
 {
     // 1 month
-    const CACHE_LIFETIME_SECONDS = 2629746;
+    public const CACHE_LIFETIME_SECONDS = 2629746;
 
     public function getData(SearchCriteriaInterface $searchCriteria)
     {

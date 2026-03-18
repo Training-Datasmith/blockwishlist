@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -382,7 +384,8 @@ class BlockWishListActionModuleFrontController extends ModuleFrontController
         );
 
         // Transform an add to favorite
-        Db::getInstance()->execute('
+        Db::getInstance()->execute(
+            '
             UPDATE `' . _DB_PREFIX_ . 'blockwishlist_statistics`
             SET `id_cart` = ' . (int) $this->context->cart->id . '
             WHERE `id_cart` = 0

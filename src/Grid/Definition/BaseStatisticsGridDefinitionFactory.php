@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -42,20 +44,23 @@ class BaseStatisticsGridDefinitionFactory extends AbstractGridDefinitionFactory
     protected function getColumns()
     {
         return (new ColumnCollection())
-                ->add((new PositionColumn('position'))
+                ->add(
+                    (new PositionColumn('position'))
                 ->setName($this->trans('Product', [], 'Modules.Blockwishlist.Admin'))
                 ->setOptions([
                     'id_field' => 'position',
                     'position_field' => 'position',
                     'update_route' => '',
                 ])
-            )
-            ->add((new ImageColumn('image'))
+                )
+            ->add(
+                (new ImageColumn('image'))
                 ->setOptions([
                     'src_field' => 'image_small_url',
                 ])
             )
-            ->add((new LinkColumn('name'))
+            ->add(
+                (new LinkColumn('name'))
                 ->setOptions([
                     'field' => 'name',
                     'route' => 'admin_product_form',
@@ -63,37 +68,43 @@ class BaseStatisticsGridDefinitionFactory extends AbstractGridDefinitionFactory
                     'route_param_field' => 'id_product',
                 ])
             )
-            ->add((new DataColumn('reference'))
+            ->add(
+                (new DataColumn('reference'))
                 ->setName($this->trans('Reference', [], 'Modules.Blockwishlist.Admin'))
                 ->setOptions([
                     'field' => 'reference',
                 ])
             )
-            ->add((new DataColumn('combination'))
+            ->add(
+                (new DataColumn('combination'))
                 ->setName($this->trans('Combination', [], 'Modules.Blockwishlist.Admin'))
                 ->setOptions([
                     'field' => 'combination',
                 ])
             )
-            ->add((new DataColumn('category_name'))
+            ->add(
+                (new DataColumn('category_name'))
                 ->setName($this->trans('Category', [], 'Modules.Blockwishlist.Admin'))
                 ->setOptions([
                     'field' => 'category_name',
                 ])
             )
-            ->add((new DataColumn('price'))
+            ->add(
+                (new DataColumn('price'))
                 ->setName($this->trans('Price (tax excl.)', [], 'Modules.Blockwishlist.Admin'))
                 ->setOptions([
                     'field' => 'price',
                 ])
             )
-            ->add((new DataColumn('quantity'))
+            ->add(
+                (new DataColumn('quantity'))
                 ->setName($this->trans('Available Qty', [], 'Modules.Blockwishlist.Admin'))
                 ->setOptions([
                     'field' => 'quantity',
                 ])
             )
-            ->add((new DataColumn('conversionRate'))
+            ->add(
+                (new DataColumn('conversionRate'))
                 ->setName($this->trans('Conversion rate', [], 'Modules.Blockwishlist.Admin'))
                 ->setOptions([
                     'field' => 'conversionRate',
