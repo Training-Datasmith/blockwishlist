@@ -19,7 +19,7 @@
  */
 class WishlistRepository
 {
-    public function getAllWishlistsProductID()
+    public function getAllWishlistsProductID(): int
     {
         return (int) Db::getInstance()
             ->getRow('SELECT `id_product` FROM `' . _DB_PREFIX_ . 'wishlist_product`');

@@ -39,7 +39,7 @@ class Install
         $this->translator = $translator;
     }
 
-    public function run()
+    public function run(): bool
     {
         return $this->installTables()
             && $this->installConfiguration()
@@ -100,7 +100,7 @@ class Install
         return $result;
     }
 
-    public function installConfiguration()
+    public function installConfiguration(): bool
     {
         $pageName = $defaultName = $createButtonLabel = [];
 

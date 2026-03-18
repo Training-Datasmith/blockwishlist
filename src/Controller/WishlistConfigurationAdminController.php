@@ -106,11 +106,10 @@ class WishlistConfigurationAdminController extends FrameworkBundleAdminControlle
     /**
      * handleForm
      *
-     * @param array $datas
      *
      * @return bool
      */
-    private function handleForm($datas)
+    private function handleForm(array $datas)
     {
         $result = true;
         $defaultLanguageId = (int) Configuration::get('PS_LANG_DEFAULT');
@@ -151,10 +150,8 @@ class WishlistConfigurationAdminController extends FrameworkBundleAdminControlle
 
     /**
      * getWishlistConfigurationDatas
-     *
-     * @return array
      */
-    private function getWishlistConfigurationDatas()
+    private function getWishlistConfigurationDatas(): array
     {
         $languages = Language::getLanguages(true);
         $wishlistNames = $wishlistDefaultTitles = $wishlistCreateNewButtonsLabel = [];
@@ -165,12 +162,10 @@ class WishlistConfigurationAdminController extends FrameworkBundleAdminControlle
             $wishlistCreateNewButtonsLabel[$lang['id_lang']] = Configuration::get('blockwishlist_CreateButtonLabel', $lang['id_lang']);
         }
 
-        $datas = [
+        return [
             'WishlistPageName' => $wishlistNames,
             'WishlistDefaultTitle' => $wishlistDefaultTitles,
             'CreateButtonLabel' => $wishlistCreateNewButtonsLabel,
         ];
-
-        return $datas;
     }
 }

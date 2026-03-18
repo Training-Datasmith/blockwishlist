@@ -27,7 +27,7 @@ use Validate;
 
 class Uninstall
 {
-    public function run()
+    public function run(): bool
     {
         return $this->dropTables() && $this->uninstallTabs();
     }

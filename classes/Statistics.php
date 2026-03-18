@@ -74,10 +74,7 @@ class Statistics extends ObjectModel
         );
     }
 
-    /**
-     * @return void
-     */
-    public static function removeNonExistingProductAttributesFromStatistics()
+    public static function removeNonExistingProductAttributesFromStatistics(): void
     {
         $dbQuery = new DbQuery();
         $dbQuery->select('bws.id_product_attribute');

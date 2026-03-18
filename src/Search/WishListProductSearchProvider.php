@@ -63,10 +63,6 @@ class WishListProductSearchProvider implements ProductSearchProviderInterface
      */
     private $translator;
 
-    /**
-     * @param Db $db
-     * @param WishList $wishList
-     */
     public function __construct(
         Db $db,
         WishList $wishList,
@@ -79,16 +75,10 @@ class WishListProductSearchProvider implements ProductSearchProviderInterface
         $this->translator = $translator;
     }
 
-    /**
-     * @param ProductSearchContext $context
-     * @param ProductSearchQuery $query
-     *
-     * @return ProductSearchResult
-     */
     public function runQuery(
         ProductSearchContext $context,
         ProductSearchQuery $query
-    ) {
+    ): \PrestaShop\PrestaShop\Core\Product\Search\ProductSearchResult {
         $result = new ProductSearchResult();
         $result->setProducts($this->getProductsOrCount($context, $query, 'products'));
         $result->setTotalProductsCount($this->getProductsOrCount($context, $query, 'count'));
@@ -100,16 +90,13 @@ class WishListProductSearchProvider implements ProductSearchProviderInterface
     }
 
     /**
-     * @param ProductSearchContext $context
-     * @param ProductSearchQuery $query
-     * @param string $type
      *
      * @return array|int
      */
     private function getProductsOrCount(
         ProductSearchContext $context,
         ProductSearchQuery $query,
-        $type = 'products'
+        string $type = 'products'
     ) {
         $querySearch = new DbQuery();
 

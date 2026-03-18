@@ -22,7 +22,7 @@ namespace PrestaShop\Module\BlockWishList\Grid\Definition;
 
 class AllTimeStatisticsGridDefinitionFactory extends BaseStatisticsGridDefinitionFactory
 {
-    protected function getId()
+    protected function getId(): string
     {
         return 'statistics_all_time';
     }

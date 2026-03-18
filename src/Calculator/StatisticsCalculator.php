@@ -63,10 +63,8 @@ class StatisticsCalculator
      * computeStatsFor
      *
      * @param string|null $statsRange
-     *
-     * @return array
      */
-    public function computeStatsFor($statsRange = null)
+    public function computeStatsFor($statsRange = null): array
     {
         $query = new DbQuery();
         $query->select('id_product');
@@ -119,12 +117,10 @@ class StatisticsCalculator
     /**
      * computeconversionRate
      *
-     * @param array $stats
      * @param string|null $dateStart
      *
-     * @return void
      */
-    public function computeConversionRate(&$stats, $dateStart = null)
+    public function computeConversionRate(array &$stats, $dateStart = null): void
     {
         $position = 0;
 
@@ -218,13 +214,11 @@ class StatisticsCalculator
     /**
      * computeConversionByProduct
      *
-     * @param string $id_product
-     * @param string $id_product_attribute
      * @param string $dateStart (Y-m-d H:i:s)
      *
      * @return float
      */
-    public function computeConversionByProduct($id_product, $id_product_attribute, $dateStart = null)
+    public function computeConversionByProduct(string $id_product, string $id_product_attribute, $dateStart = null)
     {
         $nbOrderPaidAndShipped = [];
         $queryOrders = '

@@ -22,7 +22,7 @@ namespace PrestaShop\Module\BlockWishList\Grid\Definition;
 
 class CurrentDayStatisticsGridDefinitionFactory extends BaseStatisticsGridDefinitionFactory
 {
-    protected function getId()
+    protected function getId(): string
     {
         return 'statistics_current_day';
     }

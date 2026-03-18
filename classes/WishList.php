@@ -117,7 +117,7 @@ class WishList extends ObjectModel
      */
     public function setDefault()
     {
-        if ($default = $this->getDefault($this->id_customer)) {
+        if ($default = static::getDefault($this->id_customer)) {
             Db::getInstance()->update('wishlist', ['default' => '0'], 'id_wishlist = ' . (int) $default);
         }
 
@@ -252,10 +252,7 @@ class WishList extends ObjectModel
         );
     }
 
-    /**
-     * @return void
-     */
-    public static function removeNonExistingProductAttributesFromWishlist()
+    public static function removeNonExistingProductAttributesFromWishlist(): void
     {
         $dbQuery = new DbQuery();
         $dbQuery->select('wp.id_product_attribute');
@@ -404,7 +401,7 @@ class WishList extends ObjectModel
                 WHERE pac.`id_product_attribute` = ' . (int) ($products[$i]['id_product_attribute']));
                 $products[$i]['attributes_small'] = '';
                 if ($result) {
-                    foreach ($result as $k => $row) {
+                    foreach ($result as $row) {
                         $products[$i]['attributes_small'] .= $row['attribute_name'] . ', ';
                     }
                 }
@@ -522,7 +519,7 @@ class WishList extends ObjectModel
         );
     }
 
-    public static function refreshWishList($id_wishlist)
+    public static function refreshWishList($id_wishlist): void
     {
         $old_carts = Db::getInstance((bool) _PS_USE_SQL_SLAVE_)->executeS('
         SELECT wp.id_product, wp.id_product_attribute, wpc.id_cart, UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(wpc.date_add) AS timecart
