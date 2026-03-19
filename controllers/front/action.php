@@ -360,7 +360,7 @@ class BlockWishListActionModuleFrontController extends ModuleFrontController
 
     private function generateWishListToken()
     {
-        return strtoupper(substr(sha1(uniqid((string) rand(), true) . _COOKIE_KEY_ . $this->context->customer->id), 0, 16));
+        return strtoupper(bin2hex(random_bytes(8)));
     }
 
     private function ajaxRenderMissingParams()
@@ -375,6 +375,9 @@ class BlockWishListActionModuleFrontController extends ModuleFrontController
 
     private function addProductToCartAction($params)
     {
+        $wishlist = new WishList((int) $params['idWishlist']);
+        $this->assertWriteAccess($wishlist);
+
         $productAdd = WishList::addBoughtProduct(
             $params['idWishlist'],
             $params['id_product'],
