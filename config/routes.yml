@@ -2,7 +2,7 @@ blockwishlist_configuration:
   path: blockwishlist/configuration
   methods: [GET, POST]
   defaults:
-    _controller: PrestaShop\Module\BlockWishList\Controller\WishlistConfigurationAdminController::configurationAction
+    _controller: Presta_Shop\Module\Block_Wish_List\Controller\Wishlist_Configuration_Admin_Controller::configurationAction
     _legacy_controller: 'WishlistConfigurationAdminController'
     _legacy_link: 'WishlistConfigurationAdminController'
 
@@ -10,7 +10,7 @@ blockwishlist_statistics:
   path: blockwishlist/statistics
   methods: [GET]
   defaults:
-    _controller: PrestaShop\Module\BlockWishList\Controller\WishlistConfigurationAdminController::statisticsAction
+    _controller: Presta_Shop\Module\Block_Wish_List\Controller\Wishlist_Configuration_Admin_Controller::statisticsAction
     _legacy_controller: 'WishlistStatisticsAdminController'
     _legacy_link: 'WishlistStatisticsAdminController'
 
@@ -18,4 +18,4 @@ blockwishlist_statistics_reset:
   path: blockwishlist/statistics/reset
   methods: [POST]
   defaults:
-    _controller: PrestaShop\Module\BlockWishList\Controller\WishlistConfigurationAdminController::resetStatisticsCacheAction
+    _controller: Presta_Shop\Module\Block_Wish_List\Controller\Wishlist_Configuration_Admin_Controller::resetStatisticsCacheAction

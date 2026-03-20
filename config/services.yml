@@ -1,8 +1,8 @@
 services:
   # Controller
-  PrestaShop\Module\BlockWishList\Controller\WishlistConfigurationAdminController:
+  Presta_Shop\Module\Block_Wish_List\Controller\Wishlist_Configuration_Admin_Controller:
     public: true
-    class: PrestaShop\Module\BlockWishList\Controller\WishlistConfigurationAdminController
+    class: Presta_Shop\Module\Block_Wish_List\Controller\Wishlist_Configuration_Admin_Controller
     arguments:
       - '@doctrine.cache.provider'
       - '@=service("prestashop.adapter.shop.context").getContextShopID()'
@@ -10,7 +10,7 @@ services:
   # Calculator
   prestashop.module.blockwishlist.calculator.statistics_calculator:
     public: true
-    class: PrestaShop\Module\BlockWishList\Calculator\StatisticsCalculator
+    class: Presta_Shop\Module\Block_Wish_List\Calculator\Statistics_Calculator
     arguments:
       - '@prestashop.adapter.legacy.context' #used for product presenter
       - '@=service("prestashop.core.localization.locale.repository").getLocale(service("prestashop.adapter.legacy.context").getContext().language.getLocale())' # From PS 1.7.7: "@prestashop.core.localization.locale.context_locale"
@@ -18,48 +18,48 @@ services:
   # Grid Definition
   prestashop.module.blockwishlist.grid.all_time_statistics_grid_definition_factory:
     public: true
-    class: 'PrestaShop\Module\BlockWishList\Grid\Definition\AllTimeStatisticsGridDefinitionFactory'
+    class: 'Presta_Shop\Module\Block_Wish_List\Grid\Definition\All_Time_Statistics_Grid_Definition_Factory'
     parent: 'prestashop.core.grid.definition.factory.abstract_grid_definition'
 
   prestashop.module.blockwishlist.grid.current_year_statistics_grid_definition_factory:
     public: true
-    class: 'PrestaShop\Module\BlockWishList\Grid\Definition\CurrentYearStatisticsGridDefinitionFactory'
+    class: 'Presta_Shop\Module\Block_Wish_List\Grid\Definition\Current_Year_Statistics_Grid_Definition_Factory'
     parent: 'prestashop.core.grid.definition.factory.abstract_grid_definition'
 
   prestashop.module.blockwishlist.grid.current_month_statistics_grid_definition_factory:
     public: true
-    class: 'PrestaShop\Module\BlockWishList\Grid\Definition\CurrentMonthStatisticsGridDefinitionFactory'
+    class: 'Presta_Shop\Module\Block_Wish_List\Grid\Definition\Current_Month_Statistics_Grid_Definition_Factory'
     parent: 'prestashop.core.grid.definition.factory.abstract_grid_definition'
 
   prestashop.module.blockwishlist.grid.current_day_statistics_grid_definition_factory:
     public: true
-    class: 'PrestaShop\Module\BlockWishList\Grid\Definition\CurrentDayStatisticsGridDefinitionFactory'
+    class: 'Presta_Shop\Module\Block_Wish_List\Grid\Definition\Current_Day_Statistics_Grid_Definition_Factory'
     parent: 'prestashop.core.grid.definition.factory.abstract_grid_definition'
 
   # Grid Data Factories
   prestashop.module.blockwishlist.grid.all_time_statistics_data_factory:
-    class: 'PrestaShop\Module\BlockWishList\Grid\Data\AllTimeStatisticsGridDataFactory'
+    class: 'Presta_Shop\Module\Block_Wish_List\Grid\Data\All_Time_Statistics_Grid_Data_Factory'
     arguments:
         - '@doctrine.cache.provider'
         - '@prestashop.module.blockwishlist.calculator.statistics_calculator'
         - '@=service("prestashop.adapter.shop.context").getContextShopID()'
 
   prestashop.module.blockwishlist.grid.current_year_statistics_data_factory:
-    class: 'PrestaShop\Module\BlockWishList\Grid\Data\CurrentYearStatisticsGridDataFactory'
+    class: 'Presta_Shop\Module\Block_Wish_List\Grid\Data\Current_Year_Statistics_Grid_Data_Factory'
     arguments:
         - '@doctrine.cache.provider'
         - '@prestashop.module.blockwishlist.calculator.statistics_calculator'
         - '@=service("prestashop.adapter.shop.context").getContextShopID()'
 
   prestashop.module.blockwishlist.grid.current_month_statistics_data_factory:
-    class: 'PrestaShop\Module\BlockWishList\Grid\Data\CurrentMonthStatisticsGridDataFactory'
+    class: 'Presta_Shop\Module\Block_Wish_List\Grid\Data\Current_Month_Statistics_Grid_Data_Factory'
     arguments:
         - '@doctrine.cache.provider'
         - '@prestashop.module.blockwishlist.calculator.statistics_calculator'
         - '@=service("prestashop.adapter.shop.context").getContextShopID()'
 
   prestashop.module.blockwishlist.grid.current_day_statistics_data_factory:
-    class: 'PrestaShop\Module\BlockWishList\Grid\Data\CurrentDayStatisticsGridDataFactory'
+    class: 'Presta_Shop\Module\Block_Wish_List\Grid\Data\Current_Day_Statistics_Grid_Data_Factory'
     arguments:
         - '@doctrine.cache.provider'
         - '@prestashop.module.blockwishlist.calculator.statistics_calculator'
@@ -68,7 +68,7 @@ services:
   # Grid Factories
   prestashop.module.blockwishlist.grid.all_time_stastistics_grid_factory:
     public: true
-    class: 'PrestaShop\PrestaShop\Core\Grid\GridFactory'
+    class: 'Presta_Shop\Presta_Shop\Core\Grid\Grid_Factory'
     arguments:
         - '@prestashop.module.blockwishlist.grid.all_time_statistics_grid_definition_factory'
         - '@prestashop.module.blockwishlist.grid.all_time_statistics_data_factory'
@@ -77,7 +77,7 @@ services:
 
   prestashop.module.blockwishlist.grid.current_year_stastistics_grid_factory:
     public: true
-    class: 'PrestaShop\PrestaShop\Core\Grid\GridFactory'
+    class: 'Presta_Shop\Presta_Shop\Core\Grid\Grid_Factory'
     arguments:
         - '@prestashop.module.blockwishlist.grid.current_year_statistics_grid_definition_factory'
         - '@prestashop.module.blockwishlist.grid.current_year_statistics_data_factory'
@@ -86,7 +86,7 @@ services:
 
   prestashop.module.blockwishlist.grid.current_month_stastistics_grid_factory:
     public: true
-    class: 'PrestaShop\PrestaShop\Core\Grid\GridFactory'
+    class: 'Presta_Shop\Presta_Shop\Core\Grid\Grid_Factory'
     arguments:
         - '@prestashop.module.blockwishlist.grid.current_month_statistics_grid_definition_factory'
         - '@prestashop.module.blockwishlist.grid.current_month_statistics_data_factory'
@@ -95,7 +95,7 @@ services:
 
   prestashop.module.blockwishlist.grid.current_day_stastistics_grid_factory:
     public: true
-    class: 'PrestaShop\PrestaShop\Core\Grid\GridFactory'
+    class: 'Presta_Shop\Presta_Shop\Core\Grid\Grid_Factory'
     arguments:
         - '@prestashop.module.blockwishlist.grid.current_day_statistics_grid_definition_factory'
         - '@prestashop.module.blockwishlist.grid.current_day_statistics_data_factory'
