@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,17 +19,15 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
+namespace Presta_Shop\Module\Block_Wish_List\Grid\Definition;
 
-namespace PrestaShop\Module\BlockWishList\Grid\Definition;
-
-class CurrentYearStatisticsGridDefinitionFactory extends BaseStatisticsGridDefinitionFactory
+class Current_Year_Statistics_Grid_Definition_Factory extends Base_Statistics_Grid_Definition_Factory
 {
-    protected function getId(): string
+    protected function get_id(): string
     {
         return 'statistics_current_year';
     }
-
-    protected function getName()
+    protected function get_name()
     {
         return $this->trans('Current Year Statistics', [], 'Modules.Blockwishlist.Admin');
     }

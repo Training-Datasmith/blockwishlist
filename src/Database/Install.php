@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,39 +19,31 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
+namespace Presta_Shop\Module\Block_Wish_List\Database;
 
-namespace PrestaShop\Module\BlockWishList\Database;
-
-use BlockWishList;
+use Block_Wish_List;
 use Configuration;
 use Db;
 use Language;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\Translator_Interface;
 use Tab;
-
 class Install
 {
     /**
      * @var TranslatorInterface
      */
     protected $translator;
-
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(Translator_Interface $translator)
     {
         $this->translator = $translator;
     }
-
     public function run(): bool
     {
-        return $this->installTables()
-            && $this->installConfiguration()
-            && $this->installTabs();
+        return $this->install_tables() && $this->install_configuration() && $this->install_tabs();
     }
-
-    public function installTables()
+    public function install_tables()
     {
         $sql = [];
-
         $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'wishlist` (
           `id_wishlist` int(10) unsigned NOT NULL auto_increment,
           `id_customer` int(10) unsigned NOT NULL,
@@ -65,7 +57,6 @@ class Install
           `default` int(10) unsigned default 0,
           PRIMARY KEY  (`id_wishlist`)
         ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
-
         $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'wishlist_product` (
           `id_wishlist_product` int(10) NOT NULL auto_increment,
           `id_wishlist` int(10) unsigned NOT NULL,
@@ -75,14 +66,12 @@ class Install
           `priority` int(10) unsigned NOT NULL,
           PRIMARY KEY  (`id_wishlist_product`)
         ) ENGINE=' . _MYSQL_ENGINE_ . '  DEFAULT CHARSET=utf8;';
-
         $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'wishlist_product_cart` (
           `id_wishlist_product` int(10) unsigned NOT NULL,
           `id_cart` int(10) unsigned NOT NULL,
           `quantity` int(10) unsigned NOT NULL,
           `date_add` datetime NOT NULL
         ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
-
         $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'blockwishlist_statistics` (
             `id_statistics` int(10) unsigned NOT NULL auto_increment,
             `id_cart` int(10) unsigned default NULL,
@@ -92,51 +81,39 @@ class Install
             `id_shop` int(10) unsigned default 1,
             PRIMARY KEY  (`id_statistics`)
         ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
-
         $result = true;
-
         foreach ($sql as $query) {
-            $result = $result && Db::getInstance()->execute($query);
+            $result = $result && Db::get_instance()->execute($query);
         }
-
         return $result;
     }
-
-    public function installConfiguration(): bool
+    public function install_configuration(): bool
     {
-        $pageName = $defaultName = $createButtonLabel = [];
-
-        foreach (Language::getLanguages() as $lang) {
-            $pageName[$lang['id_lang']] = $this->translator->trans('My wishlists', [], 'Modules.Blockwishlist.Admin', $lang['locale']);
-            $defaultName[$lang['id_lang']] = $this->translator->trans('My wishlist', [], 'Modules.Blockwishlist.Admin', $lang['locale']);
-            $createButtonLabel[$lang['id_lang']] = $this->translator->trans('Create new list', [], 'Modules.Blockwishlist.Admin', $lang['locale']);
+        $page_name = $default_name = $create_button_label = [];
+        foreach (Language::get_languages() as $lang) {
+            $page_name[$lang['id_lang']] = $this->translator->trans('My wishlists', [], 'Modules.Blockwishlist.Admin', $lang['locale']);
+            $default_name[$lang['id_lang']] = $this->translator->trans('My wishlist', [], 'Modules.Blockwishlist.Admin', $lang['locale']);
+            $create_button_label[$lang['id_lang']] = $this->translator->trans('Create new list', [], 'Modules.Blockwishlist.Admin', $lang['locale']);
         }
-
-        return Configuration::updateValue('blockwishlist_WishlistPageName', $pageName)
-            && Configuration::updateValue('blockwishlist_WishlistDefaultTitle', $defaultName)
-            && Configuration::updateValue('blockwishlist_CreateButtonLabel', $createButtonLabel);
+        return Configuration::update_value('blockwishlist_WishlistPageName', $page_name) && Configuration::update_value('blockwishlist_WishlistDefaultTitle', $default_name) && Configuration::update_value('blockwishlist_CreateButtonLabel', $create_button_label);
     }
-
-    public function installTabs()
+    public function install_tabs()
     {
-        $installTabCompleted = true;
-
-        foreach (BlockWishList::MODULE_ADMIN_CONTROLLERS as $controller) {
-            if (Tab::getIdFromClassName($controller['class_name'])) {
+        $install_tab_completed = true;
+        foreach (Block_Wish_List::MODULE_ADMIN_CONTROLLERS as $controller) {
+            if (Tab::get_id_from_class_name($controller['class_name'])) {
                 continue;
             }
-
             $tab = new Tab();
             $tab->class_name = $controller['class_name'];
             $tab->active = $controller['visible'];
-            foreach (Language::getLanguages() as $lang) {
+            foreach (Language::get_languages() as $lang) {
                 $tab->name[$lang['id_lang']] = $this->translator->trans($controller['name'], [], 'Modules.BlockWishList.Admin', $lang['locale']);
             }
-            $tab->id_parent = Tab::getIdFromClassName($controller['parent_class_name']);
+            $tab->id_parent = Tab::get_id_from_class_name($controller['parent_class_name']);
             $tab->module = 'blockwishlist';
-            $installTabCompleted = $installTabCompleted && $tab->add();
+            $install_tab_completed = $install_tab_completed && $tab->add();
         }
-
-        return $installTabCompleted;
+        return $install_tab_completed;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,176 +19,121 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
-
-namespace PrestaShop\Module\BlockWishList\Calculator;
+namespace Presta_Shop\Module\Block_Wish_List\Calculator;
 
 use Customer;
 use DateTime;
 use Db;
-use DbQuery;
-use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
-use PrestaShop\PrestaShop\Adapter\LegacyContext;
-use PrestaShop\PrestaShop\Adapter\Presenter\Product\ProductLazyArray;
-use PrestaShop\PrestaShop\Adapter\Presenter\Product\ProductPresenter;
-use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
-use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
-use PrestaShop\PrestaShop\Core\Localization\Locale;
-use ProductAssembler;
-use ProductPresenterFactory;
-
-class StatisticsCalculator
+use Db_Query;
+use Presta_Shop\Presta_Shop\Adapter\Image\Image_Retriever;
+use Presta_Shop\Presta_Shop\Adapter\Legacy_Context;
+use Presta_Shop\Presta_Shop\Adapter\Presenter\Product\Product_Lazy_Array;
+use Presta_Shop\Presta_Shop\Adapter\Presenter\Product\Product_Presenter;
+use Presta_Shop\Presta_Shop\Adapter\Product\Price_Formatter;
+use Presta_Shop\Presta_Shop\Adapter\Product\Product_Colors_Retriever;
+use Presta_Shop\Presta_Shop\Core\Localization\Locale;
+use Product_Assembler;
+use Product_Presenter_Factory;
+class Statistics_Calculator
 {
-    public const ARRAY_KEYS_STATS = [
-        'allTime',
-        'currentYear',
-        'currentMonth',
-        'currentDay',
-    ];
-
+    public const ARRAY_KEYS_STATS = ['allTime', 'currentYear', 'currentMonth', 'currentDay'];
     private $context;
-    private $productAssembler;
-
+    private $product_assembler;
     /**
      * @var Locale
      */
     private $locale;
-
-    public function __construct(LegacyContext $context, Locale $locale)
+    public function __construct(Legacy_Context $context, Locale $locale)
     {
-        $this->context = $context->getContext();
+        $this->context = $context->get_context();
         $this->context->customer = new Customer();
-        $this->productAssembler = new ProductAssembler($this->context);
+        $this->product_assembler = new Product_Assembler($this->context);
         $this->locale = $locale;
     }
-
     /**
      * computeStatsFor
      *
      * @param string|null $statsRange
      */
-    public function computeStatsFor($statsRange = null): array
+    public function compute_stats_for($stats_range = null): array
     {
-        $query = new DbQuery();
+        $query = new Db_Query();
         $query->select('id_product');
         $query->select('id_product_attribute');
         $query->select('date_add');
         $query->select('id_statistics');
         $query->from('blockwishlist_statistics');
         $query->where('id_shop = "' . (int) $this->context->shop->id . '"');
-
-        switch ($statsRange) {
+        switch ($stats_range) {
             case 'currentYear':
-                $dateStart = (new DateTime('now'))->modify('-1 year')->format('Y-m-d H:i:s');
+                $date_start = (new DateTime('now'))->modify('-1 year')->format('Y-m-d H:i:s');
                 break;
             case 'currentMonth':
-                $dateStart = (new DateTime('now'))->modify('-1 month')->format('Y-m-d H:i:s');
+                $date_start = (new DateTime('now'))->modify('-1 month')->format('Y-m-d H:i:s');
                 break;
             case 'currentDay':
-                $dateStart = (new DateTime('now'))->modify('-1 day')->format('Y-m-d H:i:s');
+                $date_start = (new DateTime('now'))->modify('-1 day')->format('Y-m-d H:i:s');
                 break;
             case 'allTime':
             default:
-                $dateStart = null;
+                $date_start = null;
                 break;
         }
-
-        if (null !== $dateStart) {
-            $query->where('date_add >= "' . $dateStart . '"');
+        if (null !== $date_start) {
+            $query->where('date_add >= "' . $date_start . '"');
         }
-
-        $results = Db::getInstance()->executeS($query);
+        $results = Db::get_instance()->execute_s($query);
         $stats = [];
-
         foreach ($results as $result) {
-            $productAttributeKey = $result['id_product'] . '.' . $result['id_product_attribute'];
-
-            if (isset($stats[$productAttributeKey])) {
-                $stats[$productAttributeKey] = $stats[$productAttributeKey] + 1;
+            $product_attribute_key = $result['id_product'] . '.' . $result['id_product_attribute'];
+            if (isset($stats[$product_attribute_key])) {
+                $stats[$product_attribute_key] = $stats[$product_attribute_key] + 1;
             } else {
-                $stats[$productAttributeKey] = 1;
+                $stats[$product_attribute_key] = 1;
             }
         }
-
         arsort($stats);
         $stats = array_slice($stats, 0, 10);
-        $this->computeConversionRate($stats, $dateStart);
-
+        $this->compute_conversion_rate($stats, $date_start);
         return $stats;
     }
-
     /**
      * computeconversionRate
      *
      * @param string|null $dateStart
      *
      */
-    public function computeConversionRate(array &$stats, $dateStart = null): void
+    public function compute_conversion_rate(array &$stats, $date_start = null): void
     {
         $position = 0;
-
-        foreach ($stats as $idProductAndAttribute => $count) {
+        foreach ($stats as $id_product_and_attribute => $count) {
             // first ID is product, second one is product_attribute
             $combination = '';
-            $ids = explode('.', $idProductAndAttribute);
+            $ids = explode('.', $id_product_and_attribute);
             $id_product = $ids[0];
             $id_product_attribute = $ids[1];
-            $productDetails = $this->productAssembler->assembleProduct([
-                'id_product' => $id_product,
-                'id_product_attribute' => $id_product_attribute,
-            ]);
-
-            if (!empty($productDetails['attributes'])) {
-                $combinationArr = [];
-                foreach ($productDetails['attributes'] as $attribute) {
-                    $combinationArr[] = $attribute['group'] . ' : ' . $attribute['name'];
+            $product_details = $this->product_assembler->assemble_product(['id_product' => $id_product, 'id_product_attribute' => $id_product_attribute]);
+            if (!empty($product_details['attributes'])) {
+                $combination_arr = [];
+                foreach ($product_details['attributes'] as $attribute) {
+                    $combination_arr[] = $attribute['group'] . ' : ' . $attribute['name'];
                 }
-                $combination = implode(',', $combinationArr);
+                $combination = implode(',', $combination_arr);
             }
-
-            $presentedProduct = $this->getPresentedProduct($productDetails);
-            $imgDetails = $this->getProductImage($presentedProduct);
-
-            $stats[$idProductAndAttribute] = [
-                'position' => $position,
-                'count' => $count,
-                'id_product' => $id_product,
-                'id_product_attribute' => $id_product_attribute,
-                'name' => $productDetails['name'],
-                'combination' => $combination,
-                'category_name' => $presentedProduct['category_name'],
-                'image_small_url' => $imgDetails['small']['url'],
-                'link' => $presentedProduct['link'],
-                'reference' => $productDetails['reference'],
-                'price' => $this->locale->formatPrice($productDetails['price'], $this->context->currency->iso_code),
-                'quantity' => $productDetails['quantity'],
-                'conversionRate' => $this->computeConversionByProduct($id_product, $id_product_attribute, $dateStart) . '%',
-            ];
-
+            $presented_product = $this->get_presented_product($product_details);
+            $img_details = $this->get_product_image($presented_product);
+            $stats[$id_product_and_attribute] = ['position' => $position, 'count' => $count, 'id_product' => $id_product, 'id_product_attribute' => $id_product_attribute, 'name' => $product_details['name'], 'combination' => $combination, 'category_name' => $presented_product['category_name'], 'image_small_url' => $img_details['small']['url'], 'link' => $presented_product['link'], 'reference' => $product_details['reference'], 'price' => $this->locale->format_price($product_details['price'], $this->context->currency->iso_code), 'quantity' => $product_details['quantity'], 'conversionRate' => $this->compute_conversion_by_product($id_product, $id_product_attribute, $date_start) . '%'];
             ++$position;
         }
     }
-
-    private function getPresentedProduct($productDetails)
+    private function get_presented_product($product_details)
     {
-        $presenterFactory = new ProductPresenterFactory($this->context);
-        $presentationSettings = $presenterFactory->getPresentationSettings();
-        $imageRetriever = new ImageRetriever($this->context->link);
-
-        $presenter = new ProductPresenter(
-            $imageRetriever,
-            $this->context->link,
-            new PriceFormatter(),
-            new ProductColorsRetriever(),
-            $this->context->getTranslator()
-        );
-
-        return $presenter->present(
-            $presentationSettings,
-            $productDetails,
-            $this->context->language
-        );
+        $presenter_factory = new Product_Presenter_Factory($this->context);
+        $presentation_settings = $presenter_factory->get_presentation_settings();
+        $image_retriever = new Image_Retriever($this->context->link);
+        $presenter = new Product_Presenter($image_retriever, $this->context->link, new Price_Formatter(), new Product_Colors_Retriever(), $this->context->get_translator());
+        return $presenter->present($presentation_settings, $product_details, $this->context->language);
     }
-
     /**
      * getProductImage
      *
@@ -196,23 +141,20 @@ class StatisticsCalculator
      *
      * @return array
      */
-    public function getProductImage($presentedProduct)
+    public function get_product_image($presented_product)
     {
-        $imgDetails = [];
-
-        foreach ($presentedProduct as $key => $value) {
+        $img_details = [];
+        foreach ($presented_product as $key => $value) {
             if ($key == 'embedded_attributes') {
-                $imgDetails = $value['cover'];
+                $img_details = $value['cover'];
             }
         }
-        if (!$imgDetails) {
-            $imageRetriever = new ImageRetriever($this->context->link);
-            $imgDetails = $imageRetriever->getNoPictureImage($this->context->language);
+        if (!$img_details) {
+            $image_retriever = new Image_Retriever($this->context->link);
+            $img_details = $image_retriever->get_no_picture_image($this->context->language);
         }
-
-        return $imgDetails;
+        return $img_details;
     }
-
     /**
      * computeConversionByProduct
      *
@@ -220,10 +162,10 @@ class StatisticsCalculator
      *
      * @return float
      */
-    public function computeConversionByProduct(string $id_product, string $id_product_attribute, $dateStart = null)
+    public function compute_conversion_by_product(string $id_product, string $id_product_attribute, $date_start = null)
     {
-        $nbOrderPaidAndShipped = [];
-        $queryOrders = '
+        $nb_order_paid_and_shipped = [];
+        $query_orders = '
             SELECT count(distinct(o.id_order)) as nb
             FROM ' . _DB_PREFIX_ . 'orders o
             INNER JOIN ' . _DB_PREFIX_ . 'blockwishlist_statistics bws ON (o.id_cart = bws.id_cart )
@@ -233,34 +175,26 @@ class StatisticsCalculator
             WHERE bws.`id_cart` <> 0 AND bws.`id_product` = ' . (int) $id_product . ' AND bws.`id_product_attribute` = ' . (int) $id_product_attribute . '
             AND bws.`id_shop` = ' . (int) $this->context->shop->id . '
             ';
-
-        if (null != $dateStart) {
-            $queryOrders .= 'AND bws.date_add >= "' . $dateStart . '"';
+        if (null != $date_start) {
+            $query_orders .= 'AND bws.date_add >= "' . $date_start . '"';
         }
-
-        $nbOrderPaidAndShipped = Db::getInstance()->getRow($queryOrders);
-
-        if (empty($nbOrderPaidAndShipped['nb'])) {
+        $nb_order_paid_and_shipped = Db::get_instance()->get_row($query_orders);
+        if (empty($nb_order_paid_and_shipped['nb'])) {
             return 0;
         }
-
-        $queryCountAll = new DbQuery();
-        $queryCountAll->select('COUNT(id_statistics)');
-        $queryCountAll->from('blockwishlist_statistics');
-        $queryCountAll->where('id_product = ' . $id_product);
-        $queryCountAll->where('id_product_attribute = ' . $id_product_attribute);
-        $queryCountAll->where('id_shop = ' . (int) $this->context->shop->id);
-
-        if (null != $dateStart) {
-            $queryCountAll->where('date_add >= "' . $dateStart . '"');
+        $query_count_all = new Db_Query();
+        $query_count_all->select('COUNT(id_statistics)');
+        $query_count_all->from('blockwishlist_statistics');
+        $query_count_all->where('id_product = ' . $id_product);
+        $query_count_all->where('id_product_attribute = ' . $id_product_attribute);
+        $query_count_all->where('id_shop = ' . (int) $this->context->shop->id);
+        if (null != $date_start) {
+            $query_count_all->where('date_add >= "' . $date_start . '"');
         }
-
-        $countAddedToWishlist = Db::getInstance()->getValue($queryCountAll);
-
-        if (0 != $countAddedToWishlist) {
-            return round(($nbOrderPaidAndShipped['nb'] / $countAddedToWishlist) * 100, 2);
+        $count_added_to_wishlist = Db::get_instance()->get_value($query_count_all);
+        if (0 != $count_added_to_wishlist) {
+            return round($nb_order_paid_and_shipped['nb'] / $count_added_to_wishlist * 100, 2);
         }
-
         return 0;
     }
 }

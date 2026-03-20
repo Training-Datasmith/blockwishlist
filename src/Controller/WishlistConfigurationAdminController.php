@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,155 +19,115 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
-
-namespace PrestaShop\Module\BlockWishList\Controller;
+namespace Presta_Shop\Module\Block_Wish_List\Controller;
 
 use Configuration;
-use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Cache\Cache_Provider;
 use Language;
-use PrestaShop\Module\BlockWishList\Grid\Data\BaseGridDataFactory;
-use PrestaShop\Module\BlockWishList\Type\ConfigurationType;
-use PrestaShop\PrestaShop\Core\Grid\Search\SearchCriteria;
-use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-
-class WishlistConfigurationAdminController extends FrameworkBundleAdminController
+use Presta_Shop\Module\Block_Wish_List\Grid\Data\Base_Grid_Data_Factory;
+use Presta_Shop\Module\Block_Wish_List\Type\Configuration_Type;
+use Presta_Shop\Presta_Shop\Core\Grid\Search\Search_Criteria;
+use Presta_Shop_Bundle\Controller\Admin\Framework_Bundle_Admin_Controller;
+use Symfony\Component\Http_Foundation\Json_Response;
+use Symfony\Component\Http_Foundation\Request;
+class Wishlist_Configuration_Admin_Controller extends Framework_Bundle_Admin_Controller
 {
     /**
      * @var CacheProvider
      */
     private $cache;
-
     /**
      * @var int|null
      */
-    private $shopId;
-
-    public function __construct(CacheProvider $cache, $shopId)
+    private $shop_id;
+    public function __construct(Cache_Provider $cache, $shop_id)
     {
         $this->cache = $cache;
-        $this->shopId = $shopId;
+        $this->shop_id = $shop_id;
     }
-
-    public function configurationAction(Request $request)
+    public function configuration_action(Request $request)
     {
-        $datas = $this->getWishlistConfigurationDatas();
-        $configurationForm = $this->createForm(ConfigurationType::class, $datas);
-        $configurationForm->handleRequest($request);
-        $resultHandleForm = null;
-
-        if ($configurationForm->isSubmitted() && $configurationForm->isValid()) {
-            $resultHandleForm = $this->handleForm($configurationForm->getData());
-            if ($resultHandleForm) {
-                return $this->redirectToRoute('blockwishlist_configuration');
+        $datas = $this->get_wishlist_configuration_datas();
+        $configuration_form = $this->create_form(Configuration_Type::class, $datas);
+        $configuration_form->handle_request($request);
+        $result_handle_form = null;
+        if ($configuration_form->is_submitted() && $configuration_form->is_valid()) {
+            $result_handle_form = $this->handle_form($configuration_form->get_data());
+            if ($result_handle_form) {
+                return $this->redirect_to_route('blockwishlist_configuration');
             }
         }
-
-        return $this->render('@Modules/blockwishlist/views/templates/admin/home.html.twig', [
-            'configurationForm' => $configurationForm->createView(),
-            'resultHandleForm' => $resultHandleForm,
-            'enableSidebar' => true,
-            'help_link' => $this->generateSidebarLink('WishlistConfigurationAdminController'),
-        ]);
+        return $this->render('@Modules/blockwishlist/views/templates/admin/home.html.twig', ['configurationForm' => $configuration_form->create_view(), 'resultHandleForm' => $result_handle_form, 'enableSidebar' => true, 'help_link' => $this->generate_sidebar_link('WishlistConfigurationAdminController')]);
     }
-
-    public function statisticsAction()
+    public function statistics_action()
     {
-        $searchCriteria = new SearchCriteria();
-        $allTimeStatsGridFactory = $this->get('prestashop.module.blockwishlist.grid.all_time_stastistics_grid_factory');
-        $currentYearGridFactory = $this->get('prestashop.module.blockwishlist.grid.current_year_stastistics_grid_factory');
-        $currentMonthGridFactory = $this->get('prestashop.module.blockwishlist.grid.current_month_stastistics_grid_factory');
-        $currentDayGridFactory = $this->get('prestashop.module.blockwishlist.grid.current_day_stastistics_grid_factory');
-        $allTimeStatisticsGrid = $allTimeStatsGridFactory->getGrid($searchCriteria);
-        $currentYearGrid = $currentYearGridFactory->getGrid($searchCriteria);
-        $currentMonthGrid = $currentMonthGridFactory->getGrid($searchCriteria);
-        $currentDayGrid = $currentDayGridFactory->getGrid($searchCriteria);
-
-        return $this->render('@Modules/blockwishlist/views/templates/admin/statistics.html.twig', [
-            'allTimeStatisticsGrid' => $this->presentGrid($allTimeStatisticsGrid),
-            'currentYearStatisticsGrid' => $this->presentGrid($currentYearGrid),
-            'currentMonthStatisticsGrid' => $this->presentGrid($currentMonthGrid),
-            'currentDayStatisticsGrid' => $this->presentGrid($currentDayGrid),
-            'shopId' => $this->shopId,
-            'enableSidebar' => true,
-            'help_link' => $this->generateSidebarLink('WishlistConfigurationAdminController'),
-        ]);
+        $search_criteria = new Search_Criteria();
+        $all_time_stats_grid_factory = $this->get('prestashop.module.blockwishlist.grid.all_time_stastistics_grid_factory');
+        $current_year_grid_factory = $this->get('prestashop.module.blockwishlist.grid.current_year_stastistics_grid_factory');
+        $current_month_grid_factory = $this->get('prestashop.module.blockwishlist.grid.current_month_stastistics_grid_factory');
+        $current_day_grid_factory = $this->get('prestashop.module.blockwishlist.grid.current_day_stastistics_grid_factory');
+        $all_time_statistics_grid = $all_time_stats_grid_factory->get_grid($search_criteria);
+        $current_year_grid = $current_year_grid_factory->get_grid($search_criteria);
+        $current_month_grid = $current_month_grid_factory->get_grid($search_criteria);
+        $current_day_grid = $current_day_grid_factory->get_grid($search_criteria);
+        return $this->render('@Modules/blockwishlist/views/templates/admin/statistics.html.twig', ['allTimeStatisticsGrid' => $this->present_grid($all_time_statistics_grid), 'currentYearStatisticsGrid' => $this->present_grid($current_year_grid), 'currentMonthStatisticsGrid' => $this->present_grid($current_month_grid), 'currentDayStatisticsGrid' => $this->present_grid($current_day_grid), 'shopId' => $this->shop_id, 'enableSidebar' => true, 'help_link' => $this->generate_sidebar_link('WishlistConfigurationAdminController')]);
     }
-
-    public function resetStatisticsCacheAction()
+    public function reset_statistics_cache_action()
     {
-        $result = $this->cache->delete(BaseGridDataFactory::CACHE_KEY_STATS_ALL_TIME . $this->shopId)
-            && $this->cache->delete(BaseGridDataFactory::CACHE_KEY_STATS_CURRENT_DAY . $this->shopId)
-            && $this->cache->delete(BaseGridDataFactory::CACHE_KEY_STATS_CURRENT_MONTH . $this->shopId)
-            && $this->cache->delete(BaseGridDataFactory::CACHE_KEY_STATS_CURRENT_YEAR . $this->shopId);
-
-        return new JsonResponse(['success' => $result]);
+        $result = $this->cache->delete(Base_Grid_Data_Factory::CACHE_KEY_STATS_ALL_TIME . $this->shop_id) && $this->cache->delete(Base_Grid_Data_Factory::CACHE_KEY_STATS_CURRENT_DAY . $this->shop_id) && $this->cache->delete(Base_Grid_Data_Factory::CACHE_KEY_STATS_CURRENT_MONTH . $this->shop_id) && $this->cache->delete(Base_Grid_Data_Factory::CACHE_KEY_STATS_CURRENT_YEAR . $this->shop_id);
+        return new Json_Response(['success' => $result]);
     }
-
     /**
      * handleForm
      *
      *
      * @return bool
      */
-    private function handleForm(array $datas)
+    private function handle_form(array $datas)
     {
         $result = true;
-        $defaultLanguageId = (int) Configuration::get('PS_LANG_DEFAULT');
-
+        $default_language_id = (int) Configuration::get('PS_LANG_DEFAULT');
         if (isset($datas['WishlistPageName'])) {
-            foreach ($datas['WishlistPageName'] as $langID => $value) {
-                if (empty($value) && $langID != $defaultLanguageId) {
-                    $value = $datas['WishlistPageName'][$defaultLanguageId];
+            foreach ($datas['WishlistPageName'] as $lang_id => $value) {
+                if (empty($value) && $lang_id != $default_language_id) {
+                    $value = $datas['WishlistPageName'][$default_language_id];
                 }
-                $result = $result && Configuration::updateValue('blockwishlist_WishlistPageName', [$langID => $value]);
+                $result = $result && Configuration::update_value('blockwishlist_WishlistPageName', [$lang_id => $value]);
             }
         }
-
         if (isset($datas['WishlistDefaultTitle'])) {
-            foreach ($datas['WishlistDefaultTitle'] as $langID => $value) {
-                if (empty($value) && $langID != $defaultLanguageId) {
-                    $value = $datas['WishlistDefaultTitle'][$defaultLanguageId];
+            foreach ($datas['WishlistDefaultTitle'] as $lang_id => $value) {
+                if (empty($value) && $lang_id != $default_language_id) {
+                    $value = $datas['WishlistDefaultTitle'][$default_language_id];
                 }
-                $result = $result && Configuration::updateValue('blockwishlist_WishlistDefaultTitle', [$langID => $value]);
+                $result = $result && Configuration::update_value('blockwishlist_WishlistDefaultTitle', [$lang_id => $value]);
             }
         }
-
         if (isset($datas['CreateButtonLabel'])) {
-            foreach ($datas['CreateButtonLabel'] as $langID => $value) {
-                if (empty($value) && $langID != $defaultLanguageId) {
-                    $value = $datas['CreateButtonLabel'][$defaultLanguageId];
+            foreach ($datas['CreateButtonLabel'] as $lang_id => $value) {
+                if (empty($value) && $lang_id != $default_language_id) {
+                    $value = $datas['CreateButtonLabel'][$default_language_id];
                 }
-                $result = $result && Configuration::updateValue('blockwishlist_CreateButtonLabel', [$langID => $value]);
+                $result = $result && Configuration::update_value('blockwishlist_CreateButtonLabel', [$lang_id => $value]);
             }
         }
-
         if ($result === true) {
-            $this->addFlash('success', $this->trans('Successful update.', 'Admin.Notifications.Success'));
+            $this->add_flash('success', $this->trans('Successful update.', 'Admin.Notifications.Success'));
         }
-
         return $result;
     }
-
     /**
      * getWishlistConfigurationDatas
      */
-    private function getWishlistConfigurationDatas(): array
+    private function get_wishlist_configuration_datas(): array
     {
-        $languages = Language::getLanguages(true);
-        $wishlistNames = $wishlistDefaultTitles = $wishlistCreateNewButtonsLabel = [];
-
+        $languages = Language::get_languages(true);
+        $wishlist_names = $wishlist_default_titles = $wishlist_create_new_buttons_label = [];
         foreach ($languages as $lang) {
-            $wishlistNames[$lang['id_lang']] = Configuration::get('blockwishlist_WishlistPageName', $lang['id_lang']);
-            $wishlistDefaultTitles[$lang['id_lang']] = Configuration::get('blockwishlist_WishlistDefaultTitle', $lang['id_lang']);
-            $wishlistCreateNewButtonsLabel[$lang['id_lang']] = Configuration::get('blockwishlist_CreateButtonLabel', $lang['id_lang']);
+            $wishlist_names[$lang['id_lang']] = Configuration::get('blockwishlist_WishlistPageName', $lang['id_lang']);
+            $wishlist_default_titles[$lang['id_lang']] = Configuration::get('blockwishlist_WishlistDefaultTitle', $lang['id_lang']);
+            $wishlist_create_new_buttons_label[$lang['id_lang']] = Configuration::get('blockwishlist_CreateButtonLabel', $lang['id_lang']);
         }
-
-        return [
-            'WishlistPageName' => $wishlistNames,
-            'WishlistDefaultTitle' => $wishlistDefaultTitles,
-            'CreateButtonLabel' => $wishlistCreateNewButtonsLabel,
-        ];
+        return ['WishlistPageName' => $wishlist_names, 'WishlistDefaultTitle' => $wishlist_default_titles, 'CreateButtonLabel' => $wishlist_create_new_buttons_label];
     }
 }

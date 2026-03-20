@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,48 +19,40 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
+namespace Presta_Shop\Module\Block_Wish_List\Database;
 
-namespace PrestaShop\Module\BlockWishList\Database;
-
-use BlockWishList;
+use Block_Wish_List;
 use Db;
 use Tab;
 use Validate;
-
 class Uninstall
 {
     public function run(): bool
     {
-        return $this->dropTables() && $this->uninstallTabs();
+        return $this->drop_tables() && $this->uninstall_tabs();
     }
-
-    private function dropTables()
+    private function drop_tables()
     {
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'wishlist`';
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'wishlist_product`';
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'wishlist_product_cart`';
         $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'blockwishlist_statistics`';
-
         $result = true;
         foreach ($sql as $query) {
-            $result = $result && Db::getInstance()->execute($query);
+            $result = $result && Db::get_instance()->execute($query);
         }
-
         return $result;
     }
-
-    private function uninstallTabs()
+    private function uninstall_tabs()
     {
-        $uninstallTabCompleted = true;
-
-        foreach (BlockWishList::MODULE_ADMIN_CONTROLLERS as $controller) {
-            $id_tab = (int) Tab::getIdFromClassName($controller['class_name']);
+        $uninstall_tab_completed = true;
+        foreach (Block_Wish_List::MODULE_ADMIN_CONTROLLERS as $controller) {
+            $id_tab = (int) Tab::get_id_from_class_name($controller['class_name']);
             $tab = new Tab($id_tab);
-            if (Validate::isLoadedObject($tab)) {
-                $uninstallTabCompleted = $uninstallTabCompleted && $tab->delete();
+            if (Validate::is_loaded_object($tab)) {
+                $uninstall_tab_completed = $uninstall_tab_completed && $tab->delete();
             }
         }
-
-        return $uninstallTabCompleted;
+        return $uninstall_tab_completed;
     }
 }

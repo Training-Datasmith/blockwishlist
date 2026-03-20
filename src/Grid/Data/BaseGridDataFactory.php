@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,34 +19,28 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
+namespace Presta_Shop\Module\Block_Wish_List\Grid\Data;
 
-namespace PrestaShop\Module\BlockWishList\Grid\Data;
-
-use Doctrine\Common\Cache\CacheProvider;
-use PrestaShop\Module\BlockWishList\Calculator\StatisticsCalculator;
-
-class BaseGridDataFactory
+use Doctrine\Common\Cache\Cache_Provider;
+use Presta_Shop\Module\Block_Wish_List\Calculator\Statistics_Calculator;
+class Base_Grid_Data_Factory
 {
     public const CACHE_KEY_STATS_CURRENT_DAY = 'blockwishlist.stats.currentDay';
     public const CACHE_KEY_STATS_CURRENT_MONTH = 'blockwishlist.stats.currentMonth';
     public const CACHE_KEY_STATS_CURRENT_YEAR = 'blockwishlist.stats.currentYear';
     public const CACHE_KEY_STATS_ALL_TIME = 'blockwishlist.stats.allTime';
-
     /* @var CacheProvider $cache */
     protected $cache;
-
     /* @var StatisticsCalculator $calculator */
     protected $calculator;
-
     /**
      * @var int|null
      */
-    protected $shopId;
-
-    public function __construct(CacheProvider $cache, StatisticsCalculator $calculator, $shopId)
+    protected $shop_id;
+    public function __construct(Cache_Provider $cache, Statistics_Calculator $calculator, $shop_id)
     {
         $this->cache = $cache;
         $this->calculator = $calculator;
-        $this->shopId = $shopId;
+        $this->shop_id = $shop_id;
     }
 }

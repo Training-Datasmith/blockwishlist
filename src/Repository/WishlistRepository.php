@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,11 +19,10 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
-class WishlistRepository
+class Wishlist_Repository
 {
-    public function getAllWishlistsProductID(): int
+    public function get_all_wishlists_product_id(): int
     {
-        return (int) Db::getInstance()
-            ->getRow('SELECT `id_product` FROM `' . _DB_PREFIX_ . 'wishlist_product`');
+        return (int) Db::get_instance()->get_row('SELECT `id_product` FROM `' . _DB_PREFIX_ . 'wishlist_product`');
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,28 +19,24 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
+namespace Presta_Shop\Module\Block_Wish_List\Grid\Data;
 
-namespace PrestaShop\Module\BlockWishList\Grid\Data;
-
-use PrestaShop\PrestaShop\Core\Grid\Data\Factory\GridDataFactoryInterface;
-use PrestaShop\PrestaShop\Core\Grid\Data\GridData;
-use PrestaShop\PrestaShop\Core\Grid\Record\RecordCollection;
-use PrestaShop\PrestaShop\Core\Grid\Search\SearchCriteriaInterface;
-
-class AllTimeStatisticsGridDataFactory extends BaseGridDataFactory implements GridDataFactoryInterface
+use Presta_Shop\Presta_Shop\Core\Grid\Data\Factory\Grid_Data_Factory_Interface;
+use Presta_Shop\Presta_Shop\Core\Grid\Data\Grid_Data;
+use Presta_Shop\Presta_Shop\Core\Grid\Record\Record_Collection;
+use Presta_Shop\Presta_Shop\Core\Grid\Search\Search_Criteria_Interface;
+class All_Time_Statistics_Grid_Data_Factory extends Base_Grid_Data_Factory implements Grid_Data_Factory_Interface
 {
     // 1 month
     public const CACHE_LIFETIME_SECONDS = 2629746;
-
-    public function getData(SearchCriteriaInterface $searchCriteria)
+    public function get_data(Search_Criteria_Interface $search_criteria)
     {
-        if ($this->cache->contains(self::CACHE_KEY_STATS_ALL_TIME . $this->shopId)) {
-            $results = $this->cache->fetch(self::CACHE_KEY_STATS_ALL_TIME . $this->shopId);
+        if ($this->cache->contains(self::CACHE_KEY_STATS_ALL_TIME . $this->shop_id)) {
+            $results = $this->cache->fetch(self::CACHE_KEY_STATS_ALL_TIME . $this->shop_id);
         } else {
-            $results = $this->calculator->computeStatsFor('allTime');
-            $this->cache->save(self::CACHE_KEY_STATS_ALL_TIME . $this->shopId, $results, self::CACHE_LIFETIME_SECONDS);
+            $results = $this->calculator->compute_stats_for('allTime');
+            $this->cache->save(self::CACHE_KEY_STATS_ALL_TIME . $this->shop_id, $results, self::CACHE_LIFETIME_SECONDS);
         }
-
-        return new GridData(new RecordCollection($results), count($results));
+        return new Grid_Data(new Record_Collection($results), count($results));
     }
 }

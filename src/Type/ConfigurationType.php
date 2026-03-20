@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
@@ -19,40 +19,29 @@ declare(strict_types=1);
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
+namespace Presta_Shop\Module\Block_Wish_List\Type;
 
-namespace PrestaShop\Module\BlockWishList\Type;
-
-use PrestaShop\PrestaShop\Core\ConstraintValidator\Constraints\DefaultLanguage;
-use PrestaShopBundle\Form\Admin\Type\TranslatableType;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormBuilderInterface;
-
-class ConfigurationType extends AbstractType
+use Presta_Shop\Presta_Shop\Core\Constraint_Validator\Constraints\Default_Language;
+use Presta_Shop_Bundle\Form\Admin\Type\Translatable_Type;
+use Symfony\Component\Form\Abstract_Type;
+use Symfony\Component\Form\Extension\Core\Type\Text_Type;
+use Symfony\Component\Form\Form_Builder_Interface;
+class Configuration_Type extends Abstract_Type
 {
-    public function buildForm(FormBuilderInterface $builder, array $options): void
+    public function build_form(Form_Builder_Interface $builder, array $options): void
     {
-        $builder
-            ->add('WishlistDefaultTitle', TranslatableType::class, [
-                // we'll have text area that is translatable
-                'type' => TextType::class,
-                'constraints' => [
-                    new DefaultLanguage(),
-                ],
-            ])
-            ->add('CreateButtonLabel', TranslatableType::class, [
-                // we'll have text area that is translatable
-                'type' => TextType::class,
-                'constraints' => [
-                    new DefaultLanguage(),
-                ],
-            ])
-            ->add('WishlistPageName', TranslatableType::class, [
-                // we'll have text area that is translatable
-                'type' => TextType::class,
-                'constraints' => [
-                    new DefaultLanguage(),
-                ],
-            ]);
+        $builder->add('WishlistDefaultTitle', Translatable_Type::class, [
+            // we'll have text area that is translatable
+            'type' => Text_Type::class,
+            'constraints' => [new Default_Language()],
+        ])->add('CreateButtonLabel', Translatable_Type::class, [
+            // we'll have text area that is translatable
+            'type' => Text_Type::class,
+            'constraints' => [new Default_Language()],
+        ])->add('WishlistPageName', Translatable_Type::class, [
+            // we'll have text area that is translatable
+            'type' => Text_Type::class,
+            'constraints' => [new Default_Language()],
+        ]);
     }
 }
