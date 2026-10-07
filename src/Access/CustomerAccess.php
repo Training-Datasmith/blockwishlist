@@ -59,6 +59,6 @@ class CustomerAccess
             return false;
         }
 
-        return ((int) $wishlist->id_customer) === $this->customer->id;
+        return (int) $wishlist->id_customer === (int) $this->customer->id;
     }
 }

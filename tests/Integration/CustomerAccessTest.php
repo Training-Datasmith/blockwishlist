@@ -100,12 +100,15 @@ class CustomerAccessTest extends TestCase
         $this->assertFalse($guest->hasReadAccessToWishlist($this->wishlist(5, null)));
     }
 
-    public function testWriteAccessComparesTheCustomerIdStrictly()
+    public function testWriteAccessComparesCustomerIdsAsIntegers()
     {
         $customer = new Customer();
         $customer->id = '5';
         $access = new CustomerAccess($customer);
 
+        $this->assertTrue($access->hasWriteAccessToWishlist($this->wishlist(5, '')));
+
+        $customer->id = '6';
         $this->assertFalse($access->hasWriteAccessToWishlist($this->wishlist(5, '')));
 
         $customer->id = 5;

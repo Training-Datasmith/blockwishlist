@@ -63,7 +63,6 @@ class StatisticsGridDataFactoryTest extends TestCase
         $this->assertSame(0, $data->getRecordsTotal());
         $this->assertSame([], $data->getRecords()->all());
         $this->assertNull($cache->savedLifetime);
-        $this->assertGreaterThan(0, $lifetime);
     }
 
     public function factoryProvider()

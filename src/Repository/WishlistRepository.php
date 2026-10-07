@@ -22,7 +22,7 @@ class WishlistRepository
     public function getAllWishlistsProductID()
     {
         return (int) Db::getInstance()->getValue(
-            'SELECT `id_product` FROM `' . _DB_PREFIX_ . 'wishlist_product` ORDER BY `id_product` ASC LIMIT 1'
+            'SELECT `id_product` FROM `' . _DB_PREFIX_ . 'wishlist_product` ORDER BY `id_product` ASC'
         );
     }
 }

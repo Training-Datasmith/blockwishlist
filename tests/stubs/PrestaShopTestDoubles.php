@@ -548,6 +548,9 @@ namespace {
             $host = getenv('BLOCKWISHLIST_DB_HOST') ?: '127.0.0.1';
             $port = getenv('BLOCKWISHLIST_DB_PORT') ?: '3306';
             $name = getenv('BLOCKWISHLIST_DB_NAME') ?: 'blockwishlist_test';
+            if ('_test' !== substr($name, -5)) {
+                throw new RuntimeException('Refusing to run the blockwishlist suite against "' . $name . '": it truncates and drops PrestaShop tables, so the database name must end with "_test".');
+            }
             $user = getenv('BLOCKWISHLIST_DB_USER') ?: 'blockwishlist';
             $password = getenv('BLOCKWISHLIST_DB_PASSWORD');
             if (false === $password) {
@@ -628,7 +631,7 @@ namespace {
 
         public function getRow($sql)
         {
-            $rows = $this->executeS($sql);
+            $rows = $this->executeS(rtrim($this->normalizeSql($sql), " \t\n\r\0\x0B;") . ' LIMIT 1');
             if (empty($rows)) {
                 return false;
             }
