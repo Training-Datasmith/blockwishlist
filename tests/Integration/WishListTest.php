@@ -67,20 +67,18 @@ class WishListTest extends WishlistDatabaseTestCase
         $this->assertSame([], $this->rows('SELECT `id_wishlist_product` FROM `' . _DB_PREFIX_ . 'wishlist_product_cart`'));
     }
 
-    public function testAddProductStoresZeroAndANegativeNewQuantityAsZero()
+    public function testAddProductStoresZeroAndRejectsANegativeNewQuantity()
     {
         $customerId = $this->insertCustomer('Ada', 'Lovelace');
         $wishlistId = $this->insertWishlist($customerId, 'Birthday');
 
         $this->assertTrue(WishList::addProduct($wishlistId, $customerId, 10, 0, 0));
-        $this->assertTrue(WishList::addProduct($wishlistId, $customerId, 11, 0, -1));
+        $this->assertFalse(WishList::addProduct($wishlistId, $customerId, 11, 0, -1));
 
         $rows = $this->rows('SELECT `id_product`, `quantity` FROM `' . _DB_PREFIX_ . 'wishlist_product` ORDER BY `id_product` ASC');
-        $this->assertCount(2, $rows);
+        $this->assertCount(1, $rows);
         $this->assertEquals(10, $rows[0]['id_product']);
         $this->assertEquals(0, $rows[0]['quantity']);
-        $this->assertEquals(11, $rows[1]['id_product']);
-        $this->assertEquals(0, $rows[1]['quantity']);
     }
 
     public function testAddProductRejectsACustomerWhoDoesNotOwnTheWishlist()

@@ -184,6 +184,10 @@ class WishList extends ObjectModel
             );
         }
 
+        if ((int) $quantity < 0) {
+            return false;
+        }
+
         $wishlistId = Db::getInstance()->getValue(
             'SELECT `id_wishlist` FROM `' . _DB_PREFIX_ . 'wishlist` WHERE `id_wishlist` = ' . (int) $id_wishlist . ' AND `id_customer` = ' . (int) $id_customer
         );
