@@ -129,23 +129,30 @@ class WishListTest extends WishlistDatabaseTestCase
     {
         $customerId = $this->insertCustomer('Ada', 'Lovelace');
         $wishlistId = $this->insertWishlist($customerId, 'Birthday');
-        $keptId = $this->insertWishlistProduct($wishlistId, 10, 0, 1, 1);
+        $keptProductId = $this->insertWishlistProduct($wishlistId, 10, 0, 1, 1);
+        $keptAttributeId = $this->insertWishlistProduct($wishlistId, 11, 3, 1, 1);
         $removedId = $this->insertWishlistProduct($wishlistId, 11, 0, 1, 1);
         $cartId = $this->insertCart();
-        $this->insertWishlistProductCart($keptId, $cartId, 1);
+        $this->insertWishlistProductCart($keptProductId, $cartId, 1);
+        $this->insertWishlistProductCart($keptAttributeId, $cartId, 3);
         $this->insertWishlistProductCart($removedId, $cartId, 2);
 
         $this->assertTrue(WishList::removeProduct($wishlistId, $customerId, 11, 0));
         $this->assertFalse(WishList::removeProduct($wishlistId, $customerId, 99, 0));
 
-        $products = $this->rows('SELECT `id_product` FROM `' . _DB_PREFIX_ . 'wishlist_product`');
-        $this->assertCount(1, $products);
+        $products = $this->rows('SELECT `id_product`, `id_product_attribute` FROM `' . _DB_PREFIX_ . 'wishlist_product` ORDER BY `id_product` ASC');
+        $this->assertCount(2, $products);
         $this->assertEquals(10, $products[0]['id_product']);
+        $this->assertEquals(0, $products[0]['id_product_attribute']);
+        $this->assertEquals(11, $products[1]['id_product']);
+        $this->assertEquals(3, $products[1]['id_product_attribute']);
 
-        $carts = $this->rows('SELECT `id_wishlist_product`, `quantity` FROM `' . _DB_PREFIX_ . 'wishlist_product_cart`');
-        $this->assertCount(1, $carts);
-        $this->assertEquals($keptId, $carts[0]['id_wishlist_product']);
+        $carts = $this->rows('SELECT `id_wishlist_product`, `quantity` FROM `' . _DB_PREFIX_ . 'wishlist_product_cart` ORDER BY `id_wishlist_product` ASC');
+        $this->assertCount(2, $carts);
+        $this->assertEquals($keptProductId, $carts[0]['id_wishlist_product']);
         $this->assertEquals(1, $carts[0]['quantity']);
+        $this->assertEquals($keptAttributeId, $carts[1]['id_wishlist_product']);
+        $this->assertEquals(3, $carts[1]['quantity']);
     }
 
     public function testRemoveProductFromWishlistReturnsFalseWithoutATarget()
@@ -228,20 +235,24 @@ class WishListTest extends WishlistDatabaseTestCase
         $this->assertEquals($combinationId, $rows[0]['id_product_attribute']);
     }
 
-    public function testCleanupOfAttributeZeroDeletesOnlyThatOrphanCombination()
+    public function testCleanupKeepsAttributeZeroForProductsWithoutCombinations()
     {
         $customerId = $this->insertCustomer('Ada', 'Lovelace');
         $wishlistId = $this->insertWishlist($customerId, 'Birthday');
-        $productId = $this->insertCatalogProduct('Mug');
-        $combinationId = $this->insertCombination($productId, 'Red', 8);
-        $this->insertWishlistProduct($wishlistId, $productId, $combinationId, 1, 1);
-        $this->insertWishlistProduct($wishlistId, $productId, 0, 1, 1);
+        $simpleProductId = $this->insertCatalogProduct('Mug');
+        $variantProductId = $this->insertCatalogProduct('Shirt');
+        $combinationId = $this->insertCombination($variantProductId, 'Red', 8);
+        $this->insertWishlistProduct($wishlistId, $simpleProductId, 0, 1, 1);
+        $this->insertWishlistProduct($wishlistId, $variantProductId, $combinationId, 1, 1);
 
         WishList::removeNonExistingProductAttributesFromWishlist();
 
-        $rows = $this->rows('SELECT `id_product_attribute` FROM `' . _DB_PREFIX_ . 'wishlist_product`');
-        $this->assertCount(1, $rows);
-        $this->assertEquals($combinationId, $rows[0]['id_product_attribute']);
+        $rows = $this->rows('SELECT `id_product`, `id_product_attribute` FROM `' . _DB_PREFIX_ . 'wishlist_product` ORDER BY `id_product` ASC');
+        $this->assertCount(2, $rows);
+        $this->assertEquals($simpleProductId, $rows[0]['id_product']);
+        $this->assertEquals(0, $rows[0]['id_product_attribute']);
+        $this->assertEquals($variantProductId, $rows[1]['id_product']);
+        $this->assertEquals($combinationId, $rows[1]['id_product_attribute']);
     }
 
     public function testUpdateProductRejectsPriorityOutsideZeroToTwo()

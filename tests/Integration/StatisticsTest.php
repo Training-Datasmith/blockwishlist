@@ -84,17 +84,21 @@ class StatisticsTest extends WishlistDatabaseTestCase
         $this->assertEquals(2, $remaining[0]['id_product_attribute']);
     }
 
-    public function testCleanupOfAttributeZeroDeletesOnlyThatOrphanStatistic()
+    public function testCleanupKeepsAttributeZeroForProductsWithoutCombinations()
     {
-        $productId = $this->insertCatalogProduct('Mug');
-        $combinationId = $this->insertCombination($productId, 'Red', 3);
-        $this->insertStatistic($productId, $combinationId);
-        $this->insertStatistic($productId, 0);
+        $simpleProductId = $this->insertCatalogProduct('Mug');
+        $variantProductId = $this->insertCatalogProduct('Shirt');
+        $combinationId = $this->insertCombination($variantProductId, 'Red', 3);
+        $this->insertStatistic($simpleProductId, 0);
+        $this->insertStatistic($variantProductId, $combinationId);
 
         Statistics::removeNonExistingProductAttributesFromStatistics();
 
-        $rows = $this->rows('SELECT `id_product_attribute` FROM `' . _DB_PREFIX_ . 'blockwishlist_statistics`');
-        $this->assertCount(1, $rows);
-        $this->assertEquals($combinationId, $rows[0]['id_product_attribute']);
+        $rows = $this->rows('SELECT `id_product`, `id_product_attribute` FROM `' . _DB_PREFIX_ . 'blockwishlist_statistics` ORDER BY `id_product` ASC');
+        $this->assertCount(2, $rows);
+        $this->assertEquals($simpleProductId, $rows[0]['id_product']);
+        $this->assertEquals(0, $rows[0]['id_product_attribute']);
+        $this->assertEquals($variantProductId, $rows[1]['id_product']);
+        $this->assertEquals($combinationId, $rows[1]['id_product_attribute']);
     }
 }

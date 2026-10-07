@@ -86,6 +86,7 @@ class Statistics extends ObjectModel
         $dbQuery->select('bws.id_product_attribute');
         $dbQuery->from('blockwishlist_statistics', 'bws');
         $dbQuery->leftJoin('product_attribute', 'pa', 'bws.id_product_attribute = pa.id_product_attribute');
+        $dbQuery->where('bws.id_product_attribute != 0');
         $dbQuery->where('pa.id_product_attribute IS NULL');
         $productAttributes = Db::getInstance()->executeS($dbQuery);
 
