@@ -77,23 +77,27 @@ class StatisticsCalculatorTest extends WishlistDatabaseTestCase
         $this->assertArrayNotHasKey('2.0', $calculator->computeStatsFor('allTime'));
     }
 
-    public function testComputeConversionByProductRoundsAndHonorsCartShopAndDate()
+    public function testComputeConversionByProductRequiresAPaidShippedMatchingOrder()
     {
         $this->insertStatistic(5, 1, 1, 0, 'NOW()');
         $this->insertStatistic(5, 1, 1, 0, 'NOW()');
         $this->insertStatistic(5, 1, 1, 50, 'NOW()');
         $this->insertStatistic(5, 1, 1, 51, 'DATE_SUB(NOW(), INTERVAL 3 DAY)');
+        $this->insertStatistic(5, 1, 1, 52, 'NOW()');
+        $this->insertStatistic(5, 1, 1, 53, 'NOW()');
         $this->insertStatistic(5, 1, 2, 60, 'NOW()');
-        $this->insertOrder(50, 0, 0, 99, 0);
+        $this->insertOrder(50, 0, 0, 5, 1);
         $this->insertOrder(51, 1, 1, 5, 1);
+        $this->insertOrder(52, 1, 1, 99, 1);
+        $this->insertOrder(53, 1, 1, 5, 1);
 
         $calculator = $this->calculator();
         $yesterday = (new DateTime('now'))->modify('-1 day')->format('Y-m-d H:i:s');
         $tomorrow = (new DateTime('now'))->modify('+1 day')->format('Y-m-d H:i:s');
 
         $this->assertSame(0, $calculator->computeConversionByProduct(5, 9));
-        $this->assertEquals(50.0, $calculator->computeConversionByProduct(5, 1));
-        $this->assertEquals(33.33, $calculator->computeConversionByProduct(5, 1, $yesterday));
+        $this->assertEquals(33.33, $calculator->computeConversionByProduct(5, 1));
+        $this->assertEquals(20.0, $calculator->computeConversionByProduct(5, 1, $yesterday));
         $this->assertSame(0, $calculator->computeConversionByProduct(5, 1, $tomorrow));
     }
 
