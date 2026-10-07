@@ -17,10 +17,19 @@
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
-class WishlistRepository
+class WishlistRepositoryTest extends WishlistDatabaseTestCase
 {
-    public function getAllWishlistsProductID()
+    public function testReturnsZeroWhenNoProductIsStored()
     {
-        return (int) Db::getInstance()->getValue('SELECT `id_product` FROM `' . _DB_PREFIX_ . 'wishlist_product`');
+        $this->assertSame(0, (new WishlistRepository())->getAllWishlistsProductID());
+    }
+
+    public function testReturnsTheStoredProductId()
+    {
+        $customerId = $this->insertCustomer('Ada', 'Lovelace');
+        $wishlistId = $this->insertWishlist($customerId, 'Gifts');
+        $this->insertWishlistProduct($wishlistId, 42, 0, 1, 1);
+
+        $this->assertSame(42, (new WishlistRepository())->getAllWishlistsProductID());
     }
 }

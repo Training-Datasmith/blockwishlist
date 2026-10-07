@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/8.5/phpunit.xsd"
+    bootstrap="bootstrap.php"
+    colors="true"
+    verbose="true"
+    beStrictAboutTestsThatDoNotTestAnything="true"
+>
+    <testsuites>
+        <testsuite name="blockwishlist">
+            <directory>Integration</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <env name="BLOCKWISHLIST_DB_HOST" value="127.0.0.1" force="false"/>
+        <env name="BLOCKWISHLIST_DB_PORT" value="3306" force="false"/>
+        <env name="BLOCKWISHLIST_DB_NAME" value="blockwishlist_test" force="false"/>
+        <env name="BLOCKWISHLIST_DB_USER" value="blockwishlist" force="false"/>
+        <env name="BLOCKWISHLIST_DB_PASSWORD" value="blockwishlist" force="false"/>
+    </php>
+</phpunit>

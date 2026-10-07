@@ -17,10 +17,22 @@
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
-class WishlistRepository
-{
-    public function getAllWishlistsProductID()
-    {
-        return (int) Db::getInstance()->getValue('SELECT `id_product` FROM `' . _DB_PREFIX_ . 'wishlist_product`');
-    }
+if (!defined('_PS_VERSION_')) {
+    define('_PS_VERSION_', '8.1.7');
 }
+
+if (!defined('_DB_PREFIX_')) {
+    define('_DB_PREFIX_', 'ps_');
+}
+
+if (!defined('_MYSQL_ENGINE_')) {
+    define('_MYSQL_ENGINE_', 'InnoDB');
+}
+
+if (!defined('_PS_USE_SQL_SLAVE_')) {
+    define('_PS_USE_SQL_SLAVE_', false);
+}
+
+require_once __DIR__ . '/stubs/PrestaShopTestDoubles.php';
+require_once dirname(__DIR__) . '/src/Repository/WishlistRepository.php';
+require_once __DIR__ . '/Integration/WishlistDatabaseTestCase.php';

@@ -292,7 +292,7 @@ class WishList extends ObjectModel
                 'priority' => (int) $priority,
                 'quantity' => (int) $quantity,
             ],
-            'id_wishlist = ' . (int) $id_wishlist . 'id_product` = ' . (int) $id_product . 'id_product_attribute` = ' . (int) $id_product_attribute
+            'id_wishlist = ' . (int) $id_wishlist . ' AND `id_product` = ' . (int) $id_product . ' AND `id_product_attribute` = ' . (int) $id_product_attribute
         );
     }
 

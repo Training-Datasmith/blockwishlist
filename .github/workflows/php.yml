@@ -90,3 +90,43 @@ jobs:
           phpstan-config: 'tests/phpstan/phpstan-${{ matrix.prestashop-version }}.neon'
           phpstan-version: '^0.12'
           composer-version: '2.2.18'
+
+  phpunit:
+    name: PHPUnit
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: blockwishlist_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.1.0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: pdo_mysql
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHPUnit
+        env:
+          BLOCKWISHLIST_DB_HOST: 127.0.0.1
+          BLOCKWISHLIST_DB_PORT: '3306'
+          BLOCKWISHLIST_DB_NAME: blockwishlist_test
+          BLOCKWISHLIST_DB_USER: root
+          BLOCKWISHLIST_DB_PASSWORD: ''
+        run: vendor/bin/phpunit -c tests/phpunit.xml.dist
