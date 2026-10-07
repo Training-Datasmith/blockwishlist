@@ -66,12 +66,15 @@ class Statistics extends ObjectModel
             return false;
         }
 
-        return Db::getInstance()->delete(
-            'blockwishlist_statistics',
-            ($id_product ? 'id_product = ' . (int) $id_product : '')
-            . ($id_product && $id_product_attribute ? ' AND ' : '')
-            . ($id_product_attribute ? ' id_product_attribute = ' . (int) $id_product_attribute : '')
-        );
+        $conditions = [];
+        if ($id_product !== null) {
+            $conditions[] = 'id_product = ' . (int) $id_product;
+        }
+        if ($id_product_attribute !== null) {
+            $conditions[] = 'id_product_attribute = ' . (int) $id_product_attribute;
+        }
+
+        return Db::getInstance()->delete('blockwishlist_statistics', implode(' AND ', $conditions));
     }
 
     /**

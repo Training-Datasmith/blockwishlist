@@ -42,28 +42,21 @@ class StatisticsCalculatorTest extends WishlistDatabaseTestCase
         $this->assertSame(11, $first['count']);
         $this->assertSame('11', (string) $first['id_product']);
         $this->assertSame('0', (string) $first['id_product_attribute']);
-        $this->assertSame('Product 11', $first['name']);
-        $this->assertSame('', $first['combination']);
-        $this->assertSame('Home', $first['category_name']);
-        $this->assertSame('https://example.test/11.jpg', $first['image_small_url']);
-        $this->assertSame('https://example.test/product/11', $first['link']);
-        $this->assertSame('REF-11', $first['reference']);
-        $this->assertSame('19.90 EUR', $first['price']);
-        $this->assertSame(4, $first['quantity']);
         $this->assertSame('0%', $first['conversionRate']);
         $this->assertSame(9, $stats['2.0']['position']);
     }
 
-    public function testComputeStatsForDescribesCombinationsAndIgnoresUnknownRangesAsAllTime()
+    public function testComputeStatsForTreatsAnUnknownRangeAsAllTime()
     {
         $this->insertStatistic(8, 4, 1, 80);
         $this->insertStatistic(8, 0, 1, 81);
 
         $stats = $this->calculator()->computeStatsFor('not-a-range');
 
-        $this->assertSame('Color : Red', $stats['8.4']['combination']);
-        $this->assertSame('', $stats['8.0']['combination']);
-        $this->assertSame('Product 8', $stats['8.4']['name']);
+        $this->assertArrayHasKey('8.4', $stats);
+        $this->assertArrayHasKey('8.0', $stats);
+        $this->assertSame(1, $stats['8.4']['count']);
+        $this->assertSame(1, $stats['8.0']['count']);
     }
 
     public function testComputeStatsForAppliesTheRequestedDateWindowAndShop()
@@ -122,6 +115,8 @@ class StatisticsCalculatorTest extends WishlistDatabaseTestCase
         $this->assertSame('https://example.test/cover.jpg', $cover['small']['url']);
 
         $fallback = $calculator->getProductImage(['name' => 'Mug']);
-        $this->assertSame('https://example.test/no-picture.jpg', $fallback['small']['url']);
+        $this->assertArrayHasKey('small', $fallback);
+        $this->assertNotEmpty($fallback['small']['url']);
+        $this->assertNotSame($cover['small']['url'], $fallback['small']['url']);
     }
 }

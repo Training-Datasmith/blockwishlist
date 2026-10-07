@@ -61,4 +61,40 @@ class StatisticsTest extends WishlistDatabaseTestCase
         $this->assertCount(1, $rows);
         $this->assertEquals($combinationId, $rows[0]['id_product_attribute']);
     }
+
+    public function testRemoveProductFromStatisticsTreatsZeroAsARealFilterValue()
+    {
+        $this->insertStatistic(0, 1);
+        $this->insertStatistic(11, 0);
+        $this->insertStatistic(11, 2);
+
+        $this->assertTrue(Statistics::removeProductFromStatistics(0, null));
+
+        $afterProductZero = $this->rows('SELECT `id_product`, `id_product_attribute` FROM `' . _DB_PREFIX_ . 'blockwishlist_statistics` ORDER BY `id_product_attribute` ASC');
+        $this->assertCount(2, $afterProductZero);
+        $this->assertEquals(11, $afterProductZero[0]['id_product']);
+        $this->assertEquals(0, $afterProductZero[0]['id_product_attribute']);
+        $this->assertEquals(2, $afterProductZero[1]['id_product_attribute']);
+
+        $this->assertTrue(Statistics::removeProductFromStatistics(11, 0));
+
+        $remaining = $this->rows('SELECT `id_product`, `id_product_attribute` FROM `' . _DB_PREFIX_ . 'blockwishlist_statistics`');
+        $this->assertCount(1, $remaining);
+        $this->assertEquals(11, $remaining[0]['id_product']);
+        $this->assertEquals(2, $remaining[0]['id_product_attribute']);
+    }
+
+    public function testCleanupOfAttributeZeroDeletesOnlyThatOrphanStatistic()
+    {
+        $productId = $this->insertCatalogProduct('Mug');
+        $combinationId = $this->insertCombination($productId, 'Red', 3);
+        $this->insertStatistic($productId, $combinationId);
+        $this->insertStatistic($productId, 0);
+
+        Statistics::removeNonExistingProductAttributesFromStatistics();
+
+        $rows = $this->rows('SELECT `id_product_attribute` FROM `' . _DB_PREFIX_ . 'blockwishlist_statistics`');
+        $this->assertCount(1, $rows);
+        $this->assertEquals($combinationId, $rows[0]['id_product_attribute']);
+    }
 }

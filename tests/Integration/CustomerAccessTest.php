@@ -60,18 +60,34 @@ class CustomerAccessTest extends TestCase
         $this->assertFalse($access->hasReadAccessToWishlist($wishlist));
     }
 
-    public function testASharedWishlistIsReadableWhenAnyTokenParameterIsPresent()
+    public function testASharedWishlistIsReadableOnlyWhenTheRequestTokenMatches()
     {
         $guest = new CustomerAccess(new Customer());
         $wishlist = $this->wishlist(5, 'SHARE');
 
         $_GET['token'] = '';
-        $this->assertTrue($guest->hasReadAccessToWishlist($wishlist));
+        $this->assertFalse($guest->hasReadAccessToWishlist($wishlist));
+
+        $_GET['token'] = 'unrelated';
+        $this->assertFalse($guest->hasReadAccessToWishlist($wishlist));
         $this->assertFalse($guest->hasWriteAccessToWishlist($wishlist));
 
         $_GET = [];
         $_POST['token'] = 'unrelated';
+        $this->assertFalse($guest->hasReadAccessToWishlist($wishlist));
+
+        $_GET['token'] = 'SHARE';
+        $_POST = [];
         $this->assertTrue($guest->hasReadAccessToWishlist($wishlist));
+        $this->assertFalse($guest->hasWriteAccessToWishlist($wishlist));
+
+        $_POST['token'] = 'SHARE';
+        $_GET['token'] = 'unrelated';
+        $this->assertTrue($guest->hasReadAccessToWishlist($wishlist));
+
+        $_GET['token'] = ['SHARE'];
+        $_POST = [];
+        $this->assertFalse($guest->hasReadAccessToWishlist($wishlist));
     }
 
     public function testAnEmptyOrZeroWishlistTokenDoesNotGrantSharedReadAccess()

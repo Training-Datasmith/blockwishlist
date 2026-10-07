@@ -67,33 +67,37 @@ class WishListTest extends WishlistDatabaseTestCase
         $this->assertSame([], $this->rows('SELECT `id_wishlist_product` FROM `' . _DB_PREFIX_ . 'wishlist_product_cart`'));
     }
 
-    public function testAddProductCanStoreAZeroQuantityAndRejectsANegativeNewQuantity()
+    public function testAddProductStoresZeroAndANegativeNewQuantityAsZero()
     {
         $customerId = $this->insertCustomer('Ada', 'Lovelace');
         $wishlistId = $this->insertWishlist($customerId, 'Birthday');
 
         $this->assertTrue(WishList::addProduct($wishlistId, $customerId, 10, 0, 0));
-        $this->assertFalse(WishList::addProduct($wishlistId, $customerId, 11, 0, -1));
+        $this->assertTrue(WishList::addProduct($wishlistId, $customerId, 11, 0, -1));
 
-        $rows = $this->rows('SELECT `id_product`, `quantity` FROM `' . _DB_PREFIX_ . 'wishlist_product`');
-        $this->assertCount(1, $rows);
+        $rows = $this->rows('SELECT `id_product`, `quantity` FROM `' . _DB_PREFIX_ . 'wishlist_product` ORDER BY `id_product` ASC');
+        $this->assertCount(2, $rows);
         $this->assertEquals(10, $rows[0]['id_product']);
         $this->assertEquals(0, $rows[0]['quantity']);
+        $this->assertEquals(11, $rows[1]['id_product']);
+        $this->assertEquals(0, $rows[1]['quantity']);
     }
 
-    public function testAddProductInsertsADuplicateWhenTheCustomerDoesNotOwnTheExistingRow()
+    public function testAddProductRejectsACustomerWhoDoesNotOwnTheWishlist()
     {
         $ownerId = $this->insertCustomer('Ada', 'Lovelace');
         $otherId = $this->insertCustomer('Grace', 'Hopper');
         $wishlistId = $this->insertWishlist($ownerId, 'Birthday');
         $this->insertWishlistProduct($wishlistId, 10, 0, 2, 1);
 
-        $this->assertTrue(WishList::addProduct($wishlistId, $otherId, 10, 0, 3));
+        $this->assertFalse(WishList::addProduct($wishlistId, $otherId, 10, 0, 3));
+        $this->assertFalse(WishList::addProduct($wishlistId, $otherId, 12, 0, 1));
+        $this->assertFalse(WishList::addProduct(999, $ownerId, 12, 0, 1));
 
-        $rows = $this->rows('SELECT `quantity` FROM `' . _DB_PREFIX_ . 'wishlist_product` ORDER BY `quantity` ASC');
-        $this->assertCount(2, $rows);
+        $rows = $this->rows('SELECT `id_product`, `quantity` FROM `' . _DB_PREFIX_ . 'wishlist_product`');
+        $this->assertCount(1, $rows);
+        $this->assertEquals(10, $rows[0]['id_product']);
         $this->assertEquals(2, $rows[0]['quantity']);
-        $this->assertEquals(3, $rows[1]['quantity']);
     }
 
     public function testRemoveProductDeletesTheProductAndItsCartReservation()
@@ -119,6 +123,29 @@ class WishListTest extends WishlistDatabaseTestCase
         $this->assertFalse(WishList::removeProduct(999, $ownerId, 10, 0));
         $this->assertFalse(WishList::removeProduct($wishlistId, $otherId, 10, 0));
         $this->assertCount(1, $this->rows('SELECT `id_product` FROM `' . _DB_PREFIX_ . 'wishlist_product`'));
+    }
+
+    public function testRemoveProductDeletesOnlyTheMatchingProductAndItsCartRow()
+    {
+        $customerId = $this->insertCustomer('Ada', 'Lovelace');
+        $wishlistId = $this->insertWishlist($customerId, 'Birthday');
+        $keptId = $this->insertWishlistProduct($wishlistId, 10, 0, 1, 1);
+        $removedId = $this->insertWishlistProduct($wishlistId, 11, 0, 1, 1);
+        $cartId = $this->insertCart();
+        $this->insertWishlistProductCart($keptId, $cartId, 1);
+        $this->insertWishlistProductCart($removedId, $cartId, 2);
+
+        $this->assertTrue(WishList::removeProduct($wishlistId, $customerId, 11, 0));
+        $this->assertFalse(WishList::removeProduct($wishlistId, $customerId, 99, 0));
+
+        $products = $this->rows('SELECT `id_product` FROM `' . _DB_PREFIX_ . 'wishlist_product`');
+        $this->assertCount(1, $products);
+        $this->assertEquals(10, $products[0]['id_product']);
+
+        $carts = $this->rows('SELECT `id_wishlist_product`, `quantity` FROM `' . _DB_PREFIX_ . 'wishlist_product_cart`');
+        $this->assertCount(1, $carts);
+        $this->assertEquals($keptId, $carts[0]['id_wishlist_product']);
+        $this->assertEquals(1, $carts[0]['quantity']);
     }
 
     public function testRemoveProductFromWishlistReturnsFalseWithoutATarget()
@@ -161,16 +188,28 @@ class WishListTest extends WishlistDatabaseTestCase
         $this->assertSame([], $this->rows('SELECT `id_product` FROM `' . _DB_PREFIX_ . 'wishlist_product`'));
     }
 
-    public function testRemoveProductFromWishlistTreatsZeroAsEmptyAndDeletesEveryRow()
+    public function testRemoveProductFromWishlistTreatsZeroAsARealFilterValue()
     {
         $customerId = $this->insertCustomer('Ada', 'Lovelace');
         $wishlistId = $this->insertWishlist($customerId, 'Birthday');
-        $this->insertWishlistProduct($wishlistId, 10, 1, 1, 1);
+        $this->insertWishlistProduct($wishlistId, 0, 1, 1, 1);
+        $this->insertWishlistProduct($wishlistId, 11, 0, 1, 1);
         $this->insertWishlistProduct($wishlistId, 11, 2, 1, 1);
 
         $this->assertTrue(WishList::removeProductFromWishlist(0, null));
 
-        $this->assertSame([], $this->rows('SELECT `id_product` FROM `' . _DB_PREFIX_ . 'wishlist_product`'));
+        $afterProductZero = $this->rows('SELECT `id_product`, `id_product_attribute` FROM `' . _DB_PREFIX_ . 'wishlist_product` ORDER BY `id_product_attribute` ASC');
+        $this->assertCount(2, $afterProductZero);
+        $this->assertEquals(11, $afterProductZero[0]['id_product']);
+        $this->assertEquals(0, $afterProductZero[0]['id_product_attribute']);
+        $this->assertEquals(2, $afterProductZero[1]['id_product_attribute']);
+
+        $this->assertTrue(WishList::removeProductFromWishlist(11, 0));
+
+        $remaining = $this->rows('SELECT `id_product`, `id_product_attribute` FROM `' . _DB_PREFIX_ . 'wishlist_product`');
+        $this->assertCount(1, $remaining);
+        $this->assertEquals(11, $remaining[0]['id_product']);
+        $this->assertEquals(2, $remaining[0]['id_product_attribute']);
     }
 
     public function testRemoveNonExistingProductAttributesKeepsKnownCombinations()
@@ -189,7 +228,7 @@ class WishListTest extends WishlistDatabaseTestCase
         $this->assertEquals($combinationId, $rows[0]['id_product_attribute']);
     }
 
-    public function testCleanupOfAttributeZeroDeletesEveryWishlistProduct()
+    public function testCleanupOfAttributeZeroDeletesOnlyThatOrphanCombination()
     {
         $customerId = $this->insertCustomer('Ada', 'Lovelace');
         $wishlistId = $this->insertWishlist($customerId, 'Birthday');
@@ -200,7 +239,9 @@ class WishListTest extends WishlistDatabaseTestCase
 
         WishList::removeNonExistingProductAttributesFromWishlist();
 
-        $this->assertSame([], $this->rows('SELECT `id_product` FROM `' . _DB_PREFIX_ . 'wishlist_product`'));
+        $rows = $this->rows('SELECT `id_product_attribute` FROM `' . _DB_PREFIX_ . 'wishlist_product`');
+        $this->assertCount(1, $rows);
+        $this->assertEquals($combinationId, $rows[0]['id_product_attribute']);
     }
 
     public function testUpdateProductRejectsPriorityOutsideZeroToTwo()

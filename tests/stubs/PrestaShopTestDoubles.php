@@ -560,7 +560,8 @@ namespace {
                 $this->pdo = new PDO($dsn, $user, $password, [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 ]);
-                $this->pdo->exec("SET SESSION sql_mode = REPLACE(@@SESSION.sql_mode, 'ONLY_FULL_GROUP_BY', '')");
+                // Same session mode as PrestaShop DbPDO::connect() / DbMySQLi::connect().
+                $this->pdo->exec('SET SESSION sql_mode = \'\'');
             } catch (PDOException $exception) {
                 throw new RuntimeException('Cannot connect to the blockwishlist test database "' . $name . '". ' . $exception->getMessage(), 0, $exception);
             }

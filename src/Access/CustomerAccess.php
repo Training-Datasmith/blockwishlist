@@ -42,8 +42,8 @@ class CustomerAccess
      */
     public function hasReadAccessToWishlist(WishList $wishlist)
     {
-        // Wishlist is shared
-        if (!empty($wishlist->token) && Tools::getIsset('token')) {
+        $token = Tools::getValue('token');
+        if (!empty($wishlist->token) && is_string($token) && hash_equals((string) $wishlist->token, $token)) {
             return true;
         }
 

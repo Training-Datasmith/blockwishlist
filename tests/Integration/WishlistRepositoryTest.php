@@ -24,12 +24,13 @@ class WishlistRepositoryTest extends WishlistDatabaseTestCase
         $this->assertSame(0, (new WishlistRepository())->getAllWishlistsProductID());
     }
 
-    public function testReturnsTheStoredProductId()
+    public function testReturnsTheLowestStoredProductId()
     {
         $customerId = $this->insertCustomer('Ada', 'Lovelace');
         $wishlistId = $this->insertWishlist($customerId, 'Gifts');
         $this->insertWishlistProduct($wishlistId, 42, 0, 1, 1);
+        $this->insertWishlistProduct($wishlistId, 7, 0, 1, 1);
 
-        $this->assertSame(42, (new WishlistRepository())->getAllWishlistsProductID());
+        $this->assertSame(7, (new WishlistRepository())->getAllWishlistsProductID());
     }
 }

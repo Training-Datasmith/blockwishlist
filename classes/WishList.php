@@ -184,6 +184,13 @@ class WishList extends ObjectModel
             );
         }
 
+        $wishlistId = Db::getInstance()->getValue(
+            'SELECT `id_wishlist` FROM `' . _DB_PREFIX_ . 'wishlist` WHERE `id_wishlist` = ' . (int) $id_wishlist . ' AND `id_customer` = ' . (int) $id_customer
+        );
+        if (!$wishlistId) {
+            return false;
+        }
+
         return Db::getInstance()->insert(
             'wishlist_product',
             [
@@ -211,9 +218,11 @@ class WishList extends ObjectModel
         $result = Db::getInstance()->getRow('
             SELECT w.`id_wishlist`, wp.`id_wishlist_product`
             FROM `' . _DB_PREFIX_ . 'wishlist` w
-            LEFT JOIN `' . _DB_PREFIX_ . 'wishlist_product` wp ON (wp.`id_wishlist` = w.`id_wishlist`)
-            WHERE `id_customer` = ' . (int) $id_customer . '
-            AND w.`id_wishlist` = ' . (int) $id_wishlist
+            INNER JOIN `' . _DB_PREFIX_ . 'wishlist_product` wp ON (wp.`id_wishlist` = w.`id_wishlist`)
+            WHERE w.`id_customer` = ' . (int) $id_customer . '
+            AND w.`id_wishlist` = ' . (int) $id_wishlist . '
+            AND wp.`id_product` = ' . (int) $id_product . '
+            AND wp.`id_product_attribute` = ' . (int) $id_product_attribute
         );
 
         if (empty($result)) {
@@ -244,12 +253,15 @@ class WishList extends ObjectModel
             return false;
         }
 
-        return Db::getInstance()->delete(
-            'wishlist_product',
-            ($id_product ? 'id_product = ' . (int) $id_product : '')
-            . ($id_product && $id_product_attribute ? ' AND ' : '')
-            . ($id_product_attribute ? ' id_product_attribute = ' . (int) $id_product_attribute : '')
-        );
+        $conditions = [];
+        if ($id_product !== null) {
+            $conditions[] = 'id_product = ' . (int) $id_product;
+        }
+        if ($id_product_attribute !== null) {
+            $conditions[] = 'id_product_attribute = ' . (int) $id_product_attribute;
+        }
+
+        return Db::getInstance()->delete('wishlist_product', implode(' AND ', $conditions));
     }
 
     /**
